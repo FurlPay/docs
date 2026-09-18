@@ -23,59 +23,46 @@ This document delivers the definitive, end-to-end technical specification for:
 5. **Zero-Trust AWS Nitro Enclaves**: Hardware-isolated transaction signing for gasless fee payers and hot liquidity orchestrators.
 6. **1-Year Phased Implementation Plan (2026–2027)**: A 12-month engineering execution matrix spanning four quarters.
 
-```
-+-------------------------------------------------------------------------------------------------------------------------+
-|                                          FURLPAY END-TO-END USDC PAYMENT TOPOLOGY                                        |
-+-------------------------------------------------------------------------------------------------------------------------+
-|                                                                                                                         |
-|   +--------------------------+    +--------------------------+    +--------------------------+                          |
-|   |   Android Mobile App     |    |    Wear OS Companion     |    |      iOS Mobile App      |                          |
-|   |     (React Native /      |    |   (Kotlin Compose Wear   |    |    (Swift SDK / Expo     |                          |
-|   |    AndroidKeyStore)      |    |     Data Layer Sync)     |    |     Secure Enclave)      |                          |
-|   +------------+-------------+    +------------+-------------+    +------------+-------------+                          |
-|                |                               |                               |                                        |
-|                +-------------------------------+-------------------------------+                                        |
-|                                                |                                                                        |
-|                                                | TLS 1.3 / Certificate Pinned (mTLS)                                    |
-|                                                v                                                                        |
-|   +-----------------------------------------------------------------------------------------------------------------+   |
-|   | AWS Ingress Layer: Amazon CloudFront Global Edge + AWS WAF v2 (DDoS, Bot Control, Token Bucket Rate Limiting)   |   |
-|   +----------------------------------------------------+------------------------------------------------------------+   |
-|                                                        |                                                                |
-|                                                        v                                                                |
-|   +-----------------------------------------------------------------------------------------------------------------+   |
-|   | Application Load Balancer (ALB) - Multi-AZ Private VPC Ingress (Sub-5ms Health Checks, HTTP/2 & gRPC Multiplex)  |   |
-|   +----------------------------------------------------+------------------------------------------------------------+   |
-|                                                        |                                                                |
-|                                                        v                                                                |
-|   +-----------------------------------------------------------------------------------------------------------------+   |
-|   | AWS ECS Fargate: Next.js 15 App Router Backend Cluster (apps/web)                                              |   |
-|   |   - /api/transfers/gasless (EIP-3009 Relayer Engine)       - /api/actions/pay/[orderId] (Solana Blinks)             |   |
-|   |   - /api/payments/create & execute (Payment Intents)      - /api/webhooks/card-auth (Rain JIT Card Engine)         |   |
-|   +------------+-------------------------------+-------------------------------+------------------------------------+   |
-|                |                               |                               |                                        |
-|                v                               v                               v                                        |
-|   +-------------------------+   +-----------------------------+   +-------------------------------------------------+   |
-|   | AWS ElastiCache Valkey  |   | Amazon Aurora Serverless v2 |   | AWS Nitro Enclaves (Isolated Signing vsock)     |   |
-|   | - Nonce Claims (kvSetNx)|   | - Double-Entry Ledger       |   | - Gasless Relayer Private Keys                  |   |
-|   | - Rain JIT Balance Locks|   | - Idempotency Records       |   | - Circle CCTP Mint Execution Keys               |   |
-|   | - Sub-1ms Session State |   | - Multi-AZ KMS Encrypted    |   | - Cryptographic Attestation Decrypt via KMS     |   |
-|   +-------------------------+   +-----------------------------+   +-------------------------------------------------+   |
-|                                                                                                |                        |
-|                                                +-----------------------------------------------+                        |
-|                                                |                                                                        |
-|                        +-----------------------+-----------------------+                                                |
-|                        |                                               |                                                |
-|                        v                                               v                                                |
-|   +-----------------------------------------+     +-----------------------------------------------------------------+   |
-|   | Dedicated Solana Agave v2.x Node (AWS)  |     | Circle & External Card Clearing Rails                           |   |
-|   | - EC2 i4i.8xlarge (32 vCPU, 256GB RAM)  |     | - Circle CCTP v2 (TokenMessengerMinterV2 / MessageTransmitter)  |   |
-|   | - 3.75TB NVMe RAID-0 + 180GB tmpfs      |     | - Circle Iris Attestation API (<10s Soft Finality)              |   |
-|   | - Yellowstone Dragon's Mouth gRPC Geyser|     | - Circle Mint API (Fedwire, ACH, SEPA Real-Time Settlement)    |   |
-|   | - Sub-5ms Internal VPC Latency          |     | - Rain JIT Card Rails (Visa/Mastercard Authorization <110ms)    |   |
-|   +-----------------------------------------+     +-----------------------------------------------------------------+   |
-|                                                                                                                         |
-+-------------------------------------------------------------------------------------------------------------------------+
+```mermaid
+flowchart TD
+    subgraph Clients["Client Applications"]
+        Android["Android Mobile App<br/>React Native / AndroidKeyStore"]
+        WearOS["Wear OS Companion<br/>Kotlin Compose / Data Layer Sync"]
+        iOS["iOS Mobile App<br/>Swift SDK / Expo Secure Enclave"]
+    end
+
+    subgraph Edge["AWS Edge Layer"]
+        CloudFront["AWS CloudFront Global Edge<br/>TLS 1.3 Strict"]
+        WAF["AWS WAF v2<br/>DDoS & Bot Control"]
+    end
+
+    subgraph VPC["AWS Multi-AZ VPC"]
+        ALB["Application Load Balancer (ALB)<br/>Multi-AZ Private VPC Ingress"]
+        ECS["AWS ECS Fargate Cluster<br/>Next.js 15 App Router Backend<br/>- Gasless EIP-3009 Relayer<br/>- Solana Actions / Blinks<br/>- Rain JIT Card Engine"]
+        Valkey[("AWS ElastiCache Valkey<br/>Nonce Claims & Balance Locks")]
+        Aurora[("Amazon Aurora Serverless v2<br/>Double-Entry Ledger (KMS Encrypted)")]
+        Enclave["AWS Nitro Enclaves<br/>Isolated vsock Key Signing"]
+        SolanaNode["Dedicated Solana Agave v2.x Node<br/>EC2 i4i.8xlarge (32 vCPU, 256GB RAM)<br/>3.75TB NVMe RAID-0 + tmpfs<br/>Yellowstone gRPC Geyser"]
+    end
+
+    subgraph ExternalRails["External Rails"]
+        Circle["Circle USDC & CCTP v2<br/>TokenMessengerMinterV2<br/>Circle Iris Attestation & Mint Clearing"]
+        Rain["Rain Card Rails<br/>Visa/Mastercard Authorization (Sub-110ms)"]
+    end
+
+    Android --> CloudFront
+    WearOS --> Android
+    iOS --> CloudFront
+    CloudFront --> WAF
+    WAF --> ALB
+    ALB --> ECS
+    ECS --> Valkey
+    ECS --> Aurora
+    ECS --> Enclave
+    ECS --> SolanaNode
+    ECS --> Circle
+    ECS --> Rain
+    SolanaNode -.->|gRPC Geyser Stream| ECS
 ```
 
 ---
@@ -200,48 +187,36 @@ The native Swift package provides:
 
 FurlPay's backend infrastructure runs on AWS across a dedicated Virtual Private Cloud (VPC) spanning three Availability Zones (AZs).
 
-```
-+-------------------------------------------------------------------------------------------------------------------------+
-|                                              AWS VPC NETWORK ARCHITECTURE                                                |
-|                                                     (10.100.0.0/16)                                                     |
-+-------------------------------------------------------------------------------------------------------------------------+
-|                                                                                                                         |
-|  PUBLIC SUBNETS (10.100.1.0/24, 10.100.2.0/24, 10.100.3.0/24)                                                          |
-|  +-------------------------------------------------------------------------------------------------------------------+  |
-|  | AWS Application Load Balancer (ALB) - Dual-Stack (IPv4/IPv6), TLS 1.3 Strict, ACM Certificate with Certificate Pin |  |
-|  | NAT Gateways (AZ-a, AZ-b) - Egress to Internet, Circle Iris APIs, Rain Card Rails, Push Notifications (FCM/APNs)   |  |
-|  +-------------------------------------------------------------------------------------------------------------------+  |
-|                                                           |                                                             |
-|  APP PRIVATE SUBNETS (10.100.10.0/24, 10.100.20.0/24, 10.100.30.0/24)                                                    |
-|  +-------------------------------------------------------------------------------------------------------------------+  |
-|  | Amazon ECS Fargate Cluster (Next.js 15 App Router - apps/web)                                                     |  |
-|  |   - Task Scale: 2 to 20 Tasks (Auto-scaling on CPU >65% or RequestCountPerTarget >1,500)                            |  |
-|  |   - Internal Service Discovery via AWS Cloud Map (furlpay.internal)                                               |  |
-|  +-------------------------------------------------------------------------------------------------------------------+  |
-|                               |                                      |                                                  |
-|                               v                                      v                                                  |
-|  DATA PRIVATE SUBNETS (10.100.40.0/24, 10.100.50.0/24)        ISOLATED SIGNING SUBNET (10.100.90.0/24)                   |
-|  +---------------------------------------------------+        +------------------------------------------------------+  |
-|  | Amazon Aurora Serverless v2 (PostgreSQL 16)       |        | AWS Nitro Enclaves Host (t4g.large)                  |  |
-|  |   - 0.5 to 16 ACUs, Multi-AZ High Availability    |        |   - vsock communication ONLY                         |  |
-|  |   - KMS CMK Storage Encryption                    |        |   - Isolated Enclave Memory Decryption via KMS PCR   |  |
-|  |                                                   |        |   - EIP-3009 Relayer & Solana Fee Payer Signing      |  |
-|  | Amazon ElastiCache for Valkey (Cluster Mode)      |        +------------------------------------------------------+  |
-|  |   - 2-Node Primary/Replica with Auto-Failover     |                               |                                  |
-|  |   - Nonce claims (kvSetNx), Rate Limits, JIT Locks|                               |                                  |
-|  +---------------------------------------------------+                               |                                  |
-|                                                                                      |                                  |
-|  BLOCKCHAIN PRIVATE SUBNET (10.100.60.0/24)                                         |                                  |
-|  +-----------------------------------------------------------------------------------+                                  |
-|  | Dedicated Solana RPC Node (EC2 i4i.8xlarge)                                                                          |
-|  |   - 32 vCPU, 256GB RAM, 3.75TB NVMe SSDs in RAID-0 (/var/solana/ledger)                                              |
-|  |   - 180GB RAM tmpfs AccountsDB (/mnt/accountsdb)                                                                     |
-|  |   - Agave v2.2 Validator Engine + Yellowstone Dragon's Mouth gRPC Geyser                                             |
-|  |   - VPC Internal Latency: < 3ms to ECS Fargate                                                                      |
-|  |   - Automatic Healthcheck Failover to Helius PrivateLink RPC                                                         |
-|  +-------------------------------------------------------------------------------------------------------------------+  |
-|                                                                                                                         |
-+-------------------------------------------------------------------------------------------------------------------------+
+```mermaid
+flowchart TD
+    subgraph PublicSubnets["Public Subnets (10.100.1.0/24, 10.100.2.0/24, 10.100.3.0/24)"]
+        ALB["Application Load Balancer (ALB)<br/>Dual-Stack, TLS 1.3 Strict, Certificate Pinned"]
+        NAT["NAT Gateways (AZ-a, AZ-b)<br/>Egress to Circle Iris APIs, Rain Rails, Push Notifications"]
+    end
+
+    subgraph AppSubnets["App Private Subnets (10.100.10.0/24, 10.100.20.0/24, 10.100.30.0/24)"]
+        ECS["Amazon ECS Fargate Cluster (Next.js 15 App Router)<br/>Scale: 2 to 20 Tasks / Cloud Map Service Discovery"]
+    end
+
+    subgraph DataSubnets["Data Private Subnets (10.100.40.0/24, 10.100.50.0/24)"]
+        Aurora[("Amazon Aurora Serverless v2 (PostgreSQL 16)<br/>0.5 to 16 ACUs / Multi-AZ HA / KMS CMK")]
+        Valkey[("Amazon ElastiCache for Valkey (Cluster Mode)<br/>2-Node Primary/Replica / Nonce Claims & JIT Locks")]
+    end
+
+    subgraph SigningSubnet["Isolated Signing Subnet (10.100.90.0/24)"]
+        Enclave["AWS Nitro Enclaves Host (t4g.large)<br/>vsock Communication Only<br/>KMS PCR Attestation Key Decryption<br/>EIP-3009 Relayer & Fee Payer Signing"]
+    end
+
+    subgraph BlockchainSubnet["Blockchain Private Subnet (10.100.60.0/24)"]
+        SolanaNode["Dedicated Solana RPC Node (EC2 i4i.8xlarge)<br/>32 vCPU, 256GB RAM, 3.75TB NVMe RAID-0<br/>180GB tmpfs AccountsDB<br/>Agave v2.2 + Yellowstone gRPC Geyser"]
+    end
+
+    ALB --> ECS
+    ECS --> NAT
+    ECS --> Aurora
+    ECS --> Valkey
+    ECS --> Enclave
+    ECS --> SolanaNode
 ```
 
 ### 3.1 Gasless USDC Relayer Engine (`/api/transfers/gasless`)

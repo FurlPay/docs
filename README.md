@@ -21,144 +21,146 @@
 [![Terraform](https://img.shields.io/badge/Terraform_IaC-7B42BC?style=for-the-badge&logo=terraform&logoColor=white)](https://www.terraform.io)
 [![Linux](https://img.shields.io/badge/Ubuntu_Linux-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)](https://ubuntu.com)
 
-**Enterprise-grade technical documentation, AWS cloud migration roadmaps, dedicated Agave v2.x Solana RPC specifications, Circle CCTP v2 cross-chain rails, Rain JIT card issuing blueprints, and comprehensive security audits.**
+Enterprise-grade technical documentation, AWS cloud migration roadmaps, dedicated Agave v2.x Solana RPC specifications, Circle CCTP v2 cross-chain rails, Rain JIT card issuing blueprints, and comprehensive security audits.
 
 </div>
 
 ---
 
-## 🏛️ System Architecture Overview
+## System Architecture Overview
 
+```mermaid
+flowchart TD
+    subgraph Clients["Client Applications & Edge Devices"]
+        Android["Android Native Mobile App<br/>React Native / AndroidKeyStore / BiometricPrompt"]
+        WearOS["Wear OS Companion App<br/>Jetpack Compose / Wearable Data Layer"]
+        iOS["iOS Native Mobile App & SDK<br/>Swift / Secure Enclave / PassKit"]
+    end
+
+    subgraph Ingress["AWS Global Ingress & Protection"]
+        CloudFront["AWS CloudFront Global CDN<br/>Edge TLS 1.3 Termination"]
+        WAF["AWS WAF v2<br/>DDoS Shield, Bot Control, Rate Limiting"]
+    end
+
+    subgraph PrivateVPC["AWS Private Multi-AZ VPC (10.100.0.0/16)"]
+        ALB["Application Load Balancer (ALB)<br/>Dual-Stack Multi-AZ Ingress"]
+        
+        subgraph ComputeCluster["Application Cluster (Amazon ECS Fargate)"]
+            ECS["Next.js 15 App Router Backend Cluster<br/>- Gasless Relayers (EIP-3009)<br/>- Solana Actions & Blinks<br/>- Rain JIT Card Authorization Webhooks"]
+        end
+
+        subgraph DataTier["State, Caching & Relational Storage"]
+            Valkey[("Amazon ElastiCache for Valkey<br/>Atomic Nonce Claims (kvSetNx)<br/>Rain JIT In-Memory Balance Locks")]
+            Aurora[("Amazon Aurora PostgreSQL Serverless v2<br/>Double-Entry Ledger & Idempotency Storage<br/>Multi-AZ AWS KMS CMK Encryption")]
+        end
+
+        subgraph KeyIsolation["Hardware-Isolated Cryptography"]
+            Enclave["AWS Nitro Enclaves (Isolated vsock)<br/>KMS Attestation Key Decryption<br/>Relayer & Circle CCTP Mint Signing"]
+        end
+
+        subgraph BlockchainTier["Dedicated Blockchain Node Subnet"]
+            SolanaNode["Dedicated Solana RPC Node (EC2 i4i.8xlarge)<br/>Agave v2.2 Validator Engine<br/>3.75TB NVMe RAID-0 + 180GB tmpfs AccountsDB<br/>Yellowstone Dragon's Mouth gRPC Geyser"]
+        end
+    end
+
+    subgraph Rails["Institutional Settlement & Card Networks"]
+        Circle["Circle USDC & CCTP v2<br/>TokenMessengerMinterV2 & MessageTransmitterV2<br/>Circle Iris Attestation & Fast Transfers<br/>Circle Mint Fedwire / ACH Clearing"]
+        Rain["Rain Card Rails<br/>Visa / Mastercard Principal Member<br/>Sub-110ms Just-in-Time Funding"]
+    end
+
+    Android --> CloudFront
+    WearOS --> Android
+    iOS --> CloudFront
+    CloudFront --> WAF
+    WAF --> ALB
+    ALB --> ECS
+    ECS --> Valkey
+    ECS --> Aurora
+    ECS --> Enclave
+    ECS --> SolanaNode
+    ECS --> Circle
+    ECS --> Rain
+    SolanaNode -.->|gRPC Slot Stream| ECS
 ```
-+-------------------------------------------------------------------------------------------------------------------------+
-|                                          FURLPAY END-TO-END USDC PAYMENT TOPOLOGY                                        |
-+-------------------------------------------------------------------------------------------------------------------------+
-|                                                                                                                         |
-|   +--------------------------+    +--------------------------+    +--------------------------+                          |
-|   |   Android Mobile App     |    |    Wear OS Companion     |    |      iOS Mobile App      |                          |
-|   |     (React Native /      |    |   (Kotlin Compose Wear   |    |    (Swift SDK / Expo     |                          |
-|   |    AndroidKeyStore)      |    |     Data Layer Sync)     |    |     Secure Enclave)      |                          |
-|   +------------+-------------+    +------------+-------------+    +------------+-------------+                          |
-|                |                               |                               |                                        |
-|                +-------------------------------+-------------------------------+                                        |
-|                                                | TLS 1.3 / Certificate Pinned (mTLS)                                    |
-|                                                v                                                                        |
-|   +-----------------------------------------------------------------------------------------------------------------+   |
-|   | AWS Ingress Layer: Amazon CloudFront Global Edge + AWS WAF v2 (DDoS, Bot Control, Token Bucket Rate Limiting)   |   |
-|   +----------------------------------------------------+------------------------------------------------------------+   |
-|                                                        |                                                                |
-|                                                        v                                                                |
-|   +-----------------------------------------------------------------------------------------------------------------+   |
-|   | Application Load Balancer (ALB) - Multi-AZ Private VPC Ingress (Sub-5ms Health Checks, HTTP/2 & gRPC Multiplex)  |   |
-|   +----------------------------------------------------+------------------------------------------------------------+   |
-|                                                        |                                                                |
-|                                                        v                                                                |
-|   +-----------------------------------------------------------------------------------------------------------------+   |
-|   | AWS ECS Fargate: Next.js 15 App Router Backend Cluster (apps/web)                                              |   |
-|   |   - /api/transfers/gasless (EIP-3009 Relayer Engine)       - /api/actions/pay/[orderId] (Solana Blinks)             |   |
-|   |   - /api/payments/create & execute (Payment Intents)      - /api/webhooks/card-auth (Rain JIT Card Engine)         |   |
-|   +------------+-------------------------------+-------------------------------+------------------------------------+   |
-|                |                               |                               |                                        |
-|                v                               v                               v                                        |
-|   +-------------------------+   +-----------------------------+   +-------------------------------------------------+   |
-|   | AWS ElastiCache Valkey  |   | Amazon Aurora Serverless v2 |   | AWS Nitro Enclaves (Isolated Signing vsock)     |   |
-|   | - Nonce Claims (kvSetNx)|   | - Double-Entry Ledger       |   | - Gasless Relayer Private Keys                  |   |
-|   | - Rain JIT Balance Locks|   | - Idempotency Records       |   | - Circle CCTP Mint Execution Keys               |   |
-|   | - Sub-1ms Session State |   | - Multi-AZ KMS Encrypted    |   | - Cryptographic Attestation Decrypt via KMS     |   |
-|   +-------------------------+   +-----------------------------+   +-------------------------------------------------+   |
-|                                                                                                |                        |
-|                        +-----------------------+-----------------------+-----------------------+                        |
-|                        |                                               |                                                |
-|                        v                                               v                                                |
-|   +-----------------------------------------+     +-----------------------------------------------------------------+   |
-|   | Dedicated Solana Agave v2.x Node (AWS)  |     | Circle & External Card Clearing Rails                           |   |
-|   | - EC2 i4i.8xlarge (32 vCPU, 256GB RAM)  |     | - Circle CCTP v2 (TokenMessengerMinterV2 / MessageTransmitter)  |   |
-|   | - 3.75TB NVMe RAID-0 + 180GB tmpfs      |     | - Circle Iris Attestation API (<10s Soft Finality)              |   |
-|   | - Yellowstone Dragon's Mouth gRPC Geyser|     | - Circle Mint API (Fedwire, ACH, SEPA Real-Time Settlement)    |   |
-|   | - Sub-5ms Internal VPC Latency          |     | - Rain JIT Card Rails (Visa/Mastercard Authorization <110ms)    |   |
-|   +-----------------------------------------+     +-----------------------------------------------------------------+   |
-|                                                                                                                         |
-+-------------------------------------------------------------------------------------------------------------------------+
-```
 
 ---
 
-## 📚 Master Documentation Index
+## Master Documentation Index
 
-### 🚀 1. AWS Cloud & Dedicated Infrastructure Blueprints (`aws/`)
+### 1. AWS Cloud & Dedicated Infrastructure Blueprints (aws/)
 
-* [**Cross-Platform USDC Payment Engine & AWS Architecture (2026–2027)**](aws/FURLPAY_USDC_PAYMENT_FLOW_AND_AWS_ARCHITECTURE.md)  
-  *End-to-end USDC payment flow across Android Native (`native-app`), Wear OS (`guardian`), iOS (`furlpay-swift`), and AWS dedicated infrastructure. Details hardware Keystore/Secure Enclave signing, EIP-3009 gasless transfers, Solana v0 transactions, sub-110ms Rain JIT card authorizations, Circle CCTP v2 burn-and-mint, and AWS Nitro Enclaves.*
-* [**1-Year Master Infrastructure & AWS Migration Blueprint (2026–2027)**](aws/FURLPAY_1_YEAR_AWS_INFRASTRUCTURE_REPORT.md)  
-  *Complete 12-month engineering roadmap moving FurlPay from Vercel edge functions and managed RPC providers (Helius/QuickNode) to a private Multi-AZ VPC on Amazon Web Services (AWS).*
-* [**AWS Infrastructure Cost Optimization & FinOps Reduction Report**](aws/FURLPAY_AWS_COST_OPTIMIZATION_REPORT.md)  
-  *FinOps engineering analysis slashing annual AWS infrastructure expenditures from **\$44,040/year** down to **\$21,480/year (51.2% reduction)** by eliminating `io2` Block Express IOPS charges in favor of local Nitro NVMe SSDs (`i4i.8xlarge`), adopting ElastiCache for Valkey, and optimizing standby RPC failover.*
-* [**Zero-Cash AWS Blueprint & Production Solana Node Specification**](aws/FURLPAY_AWS_FREE_TIER_NODE_CONFIG_REPORT.md)  
-  *Running 100% free on AWS via capital stacking (\$25,000–\$100,000 AWS Activate credits + Solana Foundation grants). Contains official Agave v2.2 validator arguments, Linux sysctl tuning (`21-agave-validator.conf`), dual NVMe RAID-0 storage scripts, tmpfs AccountsDB setup, Yellowstone Dragon's Mouth gRPC configuration, and automated slot health monitoring.*
-
----
-
-### 🛡️ 2. Security Audits & Vulnerability Assessments (`audit/`)
-
-* [**Master Monorepo Security Audit Report**](audit/FULL_CODEBASE_AUDIT_REPORT.md)  
-  *Exhaustive code audit across Solana Anchor programs, Next.js API routes, Android/Wear OS native applications, and client SDKs. Uncovers and remediates critical vulnerabilities including the Solana escrow token drain in `auto_release.rs`, merchant wallet fallback to `1111...1111`, WooCommerce/Magento HMAC bypass, Swift timing side-channel leaks, and Android SQLite encryption.*
-* [**Mobile Security Audit & Hardening Guide**](docs/MOBILE_SECURITY_AUDIT.md)  
-  *Analysis of Android and iOS cryptographic boundaries, reverse engineering protections, anti-hooking checks, and biometric authentication gates.*
-* [**x402 Micropayment Attack Vectors & Mitigation**](docs/security/x402-attacks.md)  
-  *Facilitator-layer hardening for HTTP 402 AI agent payment rails, closing cross-resource substitution (F1) and duplicate settlement race conditions (F2).*
-* [**Transaction Security Standards**](docs/TRANSACTION_SECURITY.md)  
-  *Formal verification of transaction signing, nonce isolation, and replay defense mechanisms.*
+* [Cross-Platform USDC Payment Engine & AWS Architecture (2026–2027)](aws/FURLPAY_USDC_PAYMENT_FLOW_AND_AWS_ARCHITECTURE.md)  
+  End-to-end USDC payment flow across Android Native (`native-app`), Wear OS (`guardian`), iOS (`furlpay-swift`), and AWS dedicated infrastructure. Details hardware Keystore/Secure Enclave signing, EIP-3009 gasless transfers, Solana v0 transactions, sub-110ms Rain JIT card authorizations, Circle CCTP v2 burn-and-mint, and AWS Nitro Enclaves.
+* [1-Year Master Infrastructure & AWS Migration Blueprint (2026–2027)](aws/FURLPAY_1_YEAR_AWS_INFRASTRUCTURE_REPORT.md)  
+  Complete 12-month engineering roadmap moving FurlPay from Vercel edge functions and managed RPC providers (Helius/QuickNode) to a private Multi-AZ VPC on Amazon Web Services (AWS).
+* [AWS Infrastructure Cost Optimization & FinOps Reduction Report](aws/FURLPAY_AWS_COST_OPTIMIZATION_REPORT.md)  
+  FinOps engineering analysis slashing annual AWS infrastructure expenditures from **\$44,040/year** down to **\$21,480/year (51.2% reduction)** by eliminating `io2` Block Express IOPS charges in favor of local Nitro NVMe SSDs (`i4i.8xlarge`), adopting ElastiCache for Valkey, and optimizing standby RPC failover.
+* [Zero-Cash AWS Blueprint & Production Solana Node Specification](aws/FURLPAY_AWS_FREE_TIER_NODE_CONFIG_REPORT.md)  
+  Running 100% free on AWS via capital stacking (\$25,000–\$100,000 AWS Activate credits + Solana Foundation grants). Contains official Agave v2.2 validator arguments, Linux sysctl tuning (`21-agave-validator.conf`), dual NVMe RAID-0 storage scripts, tmpfs AccountsDB setup, Yellowstone Dragon's Mouth gRPC configuration, and automated slot health monitoring.
 
 ---
 
-### 📱 3. Mobile, Wearable & Client Protocols (`docs/`)
+### 2. Security Audits & Vulnerability Assessments (audit/)
 
-* [**Self-Custodial Wallet Architecture**](docs/SELF-CUSTODIAL-WALLET-DESIGN.md)  
-  *BIP-39, SLIP-0010 (Solana Ed25519), and BIP-44 (EVM Secp256k1) key generation, memory zeroization, and multi-account derivation.*
-* [**Android Native Release & Signing Runbook**](docs/ANDROID-RELEASE.md)  
-  *Google Play Console signing keys, APK optimization, and ProGuard/R8 obfuscation rules.*
-* [**Google Play Store Signing Runbook**](docs/PLAY-SIGNING-RUNBOOK.md)  
-  *Step-by-step key registration, upload keystores, and app integrity verification.*
-* [**Certificate Pinning & Rotation Runbook**](docs/CERT-PIN-ROTATION.md)  
-  *Zero-downtime HPKP / mTLS certificate rotation for mobile network security configs.*
-* [**Hardware Wallet Research & Integration**](docs/HARDWARE-WALLET-RESEARCH.md)  
-  *Tangem, Ledger, and NFC hardware-token signing integrations for high-net-worth accounts.*
+* [Master Monorepo Security Audit Report](audit/FULL_CODEBASE_AUDIT_REPORT.md)  
+  Exhaustive code audit across Solana Anchor programs, Next.js API routes, Android/Wear OS native applications, and client SDKs. Uncovers and remediates critical vulnerabilities including the Solana escrow token drain in `auto_release.rs`, merchant wallet fallback to `1111...1111`, WooCommerce/Magento HMAC bypass, Swift timing side-channel leaks, and Android SQLite encryption.
+* [Mobile Security Audit & Hardening Guide](docs/MOBILE_SECURITY_AUDIT.md)  
+  Analysis of Android and iOS cryptographic boundaries, reverse engineering protections, anti-hooking checks, and biometric authentication gates.
+* [x402 Micropayment Attack Vectors & Mitigation](docs/security/x402-attacks.md)  
+  Facilitator-layer hardening for HTTP 402 AI agent payment rails, closing cross-resource substitution (F1) and duplicate settlement race conditions (F2).
+* [Transaction Security Standards](docs/TRANSACTION_SECURITY.md)  
+  Formal verification of transaction signing, nonce isolation, and replay defense mechanisms.
 
 ---
 
-### ⚡ 4. Protocols, Settlement & Custody Models (`docs/`)
+### 3. Mobile, Wearable & Client Protocols (docs/)
 
-* [**Production Go-Live Money Runbook**](docs/GO-LIVE-MONEY.md)  
-  *Financial operation guidelines, liquidity provisioning, and treasury hot/warm/cold balance thresholds.*
-* [**Ledger Reconciliation & Invariant Checks**](docs/RECONCILIATION.md)  
-  *Continuous double-entry verification between off-chain balances and on-chain token states.*
-* [**Balance Custody Mapping**](docs/BALANCE-CUSTODY-MAP.md)  
-  *Taxonomy of self-custody vs. custodial escrow accounts across multi-chain rails.*
-* [**Custody Disclosure & Regulatory Disclaimers**](docs/CUSTODY-DISCLOSURE.md)  
-  *Compliant disclosure language for retail and institutional stablecoin holders.*
-* [**API v1 Surface Specification**](docs/API-V1-SURFACE.md)  
-  *Public REST & WebSocket interface contracts for merchant integrations.*
-* [**Verified Protocol Claims**](docs/VERIFIED-CLAIMS.md)  
-  *Benchmarked performance figures: sub-500ms settlement, 58,000+ edge requests, 0% error rate.*
+* [Self-Custodial Wallet Architecture](docs/SELF-CUSTODIAL-WALLET-DESIGN.md)  
+  BIP-39, SLIP-0010 (Solana Ed25519), and BIP-44 (EVM Secp256k1) key generation, memory zeroization, and multi-account derivation.
+* [Android Native Release & Signing Runbook](docs/ANDROID-RELEASE.md)  
+  Google Play Console signing keys, APK optimization, and ProGuard/R8 obfuscation rules.
+* [Google Play Store Signing Runbook](docs/PLAY-SIGNING-RUNBOOK.md)  
+  Step-by-step key registration, upload keystores, and app integrity verification.
+* [Certificate Pinning & Rotation Runbook](docs/CERT-PIN-ROTATION.md)  
+  Zero-downtime HPKP / mTLS certificate rotation for mobile network security configs.
+* [Hardware Wallet Research & Integration](docs/HARDWARE-WALLET-RESEARCH.md)  
+  Tangem, Ledger, and NFC hardware-token signing integrations for high-net-worth accounts.
 
 ---
 
-### 🌐 5. Expansion Blueprints & Strategy (`reports/`)
+### 4. Protocols, Settlement & Custody Models (docs/)
 
-* [**Singapore Expansion Master Blueprint**](reports/furlpay_singapore_expansion_master_blueprint.md)  
-  *MAS Major Payment Institution (MPI) compliance roadmap, SGQR / PayNow integration, and Southeast Asian cross-border settlement.*
-* [**USDC Travel Market & Tourism Rails**](reports/furlpay_singapore_usdc_travel_market_report.md)  
-  *Stablecoin travel spend analysis, merchant discount rate (MDR) disruption, and hotel direct-settlement protocols.*
-* [**USDC Travel Architecture & Security Blueprint**](reports/furlpay_usdc_travel_architecture_and_security_blueprint.md)  
-  *Offline travel vouchers, MCC-locked virtual cards, and airline ticketing integration.*
-* [**Algorithmic Settlement & Competitive Disruption**](reports/furlpay_algorithmic_settlement_competitive_report.md)  
-  *Comparative analysis against Stripe, RedotPay, and traditional acquiring networks.*
-* [**Partner Onboarding Master Report**](reports/furlpay_partner_onboarding_master_report.md)  
-  *Technical guidelines for payment service providers (PSPs), independent sales organizations (ISOs), and payment gateways.*
+* [Production Go-Live Money Runbook](docs/GO-LIVE-MONEY.md)  
+  Financial operation guidelines, liquidity provisioning, and treasury hot/warm/cold balance thresholds.
+* [Ledger Reconciliation & Invariant Checks](docs/RECONCILIATION.md)  
+  Continuous double-entry verification between off-chain balances and on-chain token states.
+* [Balance Custody Mapping](docs/BALANCE-CUSTODY-MAP.md)  
+  Taxonomy of self-custody vs. custodial escrow accounts across multi-chain rails.
+* [Custody Disclosure & Regulatory Disclaimers](docs/CUSTODY-DISCLOSURE.md)  
+  Compliant disclosure language for retail and institutional stablecoin holders.
+* [API v1 Surface Specification](docs/API-V1-SURFACE.md)  
+  Public REST & WebSocket interface contracts for merchant integrations.
+* [Verified Protocol Claims](docs/VERIFIED-CLAIMS.md)  
+  Benchmarked performance figures: sub-500ms settlement, 58,000+ edge requests, 0% error rate.
 
 ---
 
-## 🛠️ Technology Stack Breakdown
+### 5. Expansion Blueprints & Strategy (reports/)
+
+* [Singapore Expansion Master Blueprint](reports/furlpay_singapore_expansion_master_blueprint.md)  
+  MAS Major Payment Institution (MPI) compliance roadmap, SGQR / PayNow integration, and Southeast Asian cross-border settlement.
+* [USDC Travel Market & Tourism Rails](reports/furlpay_singapore_usdc_travel_market_report.md)  
+  Stablecoin travel spend analysis, merchant discount rate (MDR) disruption, and hotel direct-settlement protocols.
+* [USDC Travel Architecture & Security Blueprint](reports/furlpay_usdc_travel_architecture_and_security_blueprint.md)  
+  Offline travel vouchers, MCC-locked virtual cards, and airline ticketing integration.
+* [Algorithmic Settlement & Competitive Disruption](reports/furlpay_algorithmic_settlement_competitive_report.md)  
+  Comparative analysis against Stripe, RedotPay, and traditional acquiring networks.
+* [Partner Onboarding Master Report](reports/furlpay_partner_onboarding_master_report.md)  
+  Technical guidelines for payment service providers (PSPs), independent sales organizations (ISOs), and payment gateways.
+
+---
+
+## Technology Stack Breakdown
 
 | Layer | Technologies & Protocols |
 | :--- | :--- |
@@ -172,11 +174,11 @@
 
 ---
 
-## 🤝 Community & Support
+## Community & Support
 
-- **GitHub Organization**: [github.com/FurlPay](https://github.com/FurlPay)
-- **Developer Documentation**: [github.com/FurlPay/docs](https://github.com/FurlPay/docs)
-- **Security Inquiries**: [security@furlpay.com](mailto:security@furlpay.com)
+- GitHub Organization: [github.com/FurlPay](https://github.com/FurlPay)
+- Developer Documentation: [github.com/FurlPay/docs](https://github.com/FurlPay/docs)
+- Security Inquiries: [security@furlpay.com](mailto:security@furlpay.com)
 
 ---
 

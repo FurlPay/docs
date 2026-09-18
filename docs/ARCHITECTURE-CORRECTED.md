@@ -187,7 +187,7 @@ attestation is polled. Needs an attestation-timeout policy.
 
 - `/api/banking` no longer fabricates payable account details. It returned a
   routing number attributed to Cross River Bank, a Wise IBAN/SWIFT pair, a Wise
-  sort code, and `UPI: ashutosh@furlpay` with IFSC `YESB0000001` — with no
+  sort code, and `UPI: merchant@furlpay` with IFSC `YESB0000001` — with no
   production guard at all. It now returns 503 in every environment.
 - The Bridge, Wise and Marqeta webhook endpoints are deleted.
 - Card issuing, ordering, activation, reissue, PIN, reveal, device-wallet
