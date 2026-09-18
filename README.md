@@ -29,6 +29,14 @@ Enterprise-grade technical documentation, AWS cloud migration roadmaps, dedicate
 
 ## System Architecture Overview
 
+<div align="center">
+
+![FurlPay Production Architecture](assets/furlpay-engineering.png)
+
+*Figure 1: FurlPay Production Architecture — Multi-AZ Private VPC, Dedicated Solana RPC Nodes, ECS Fargate Next.js 15 Backend, Hardware-Isolated Nitro Enclaves, and Institutional Clearing Rails.*
+
+</div>
+
 ```mermaid
 flowchart TD
     subgraph Clients["Client Applications & Edge Devices"]
@@ -83,26 +91,41 @@ flowchart TD
     SolanaNode -.->|gRPC Slot Stream| ECS
 ```
 
+<div align="center">
+
+![FurlPay Payment Rails & Settlement Architecture](assets/rails-architecture.png)
+
+*Figure 2: End-to-End Stablecoin Payment Rails, Hardware Key Signing, and Sub-110ms Rain JIT Card Authorization Pipeline.*
+
+</div>
+
 ---
 
 ## Master Documentation Index
 
-### 1. AWS Cloud & Dedicated Infrastructure Blueprints (aws/)
+### 1. Engineering Blog & Technical Articles (blog/)
+
+* [Scaling Stablecoin Payments to Millions: Why We Migrated FurlPay from Shared RPCs to Dedicated AWS Infrastructure](blog/scaling-stablecoin-payments-to-millions-aws.md)  
+  In-depth architectural post analyzing $1.79T in monthly stablecoin volume, Visa/Allium real-economy data, Singapore's clearing hub, sub-3ms dedicated Agave Solana RPC nodes on EC2 `i4i.8xlarge`, sub-110ms Rain JIT card webhook processing, Circle CCTP v2 cross-chain burn-and-mint, and 51.2% FinOps cost reduction.
+
+---
+
+### 2. AWS Cloud & Dedicated Infrastructure Blueprints (aws/)
 
 * [Cross-Platform USDC Payment Engine & AWS Architecture (2026–2027)](aws/FURLPAY_USDC_PAYMENT_FLOW_AND_AWS_ARCHITECTURE.md)  
   End-to-end USDC payment flow across Android Native (`native-app`), Wear OS (`guardian`), iOS (`furlpay-swift`), and AWS dedicated infrastructure. Details hardware Keystore/Secure Enclave signing, EIP-3009 gasless transfers, Solana v0 transactions, sub-110ms Rain JIT card authorizations, Circle CCTP v2 burn-and-mint, and AWS Nitro Enclaves.
 * [1-Year Master Infrastructure & AWS Migration Blueprint (2026–2027)](aws/FURLPAY_1_YEAR_AWS_INFRASTRUCTURE_REPORT.md)  
   Complete 12-month engineering roadmap moving FurlPay from Vercel edge functions and managed RPC providers (Helius/QuickNode) to a private Multi-AZ VPC on Amazon Web Services (AWS).
 * [AWS Infrastructure Cost Optimization & FinOps Reduction Report](aws/FURLPAY_AWS_COST_OPTIMIZATION_REPORT.md)  
-  FinOps engineering analysis slashing annual AWS infrastructure expenditures from **\$44,040/year** down to **\$21,480/year (51.2% reduction)** by eliminating `io2` Block Express IOPS charges in favor of local Nitro NVMe SSDs (`i4i.8xlarge`), adopting ElastiCache for Valkey, and optimizing standby RPC failover.
+  FinOps engineering analysis slashing annual AWS infrastructure expenditures from **$44,040/year** down to **$21,480/year (51.2% reduction)** by eliminating `io2` Block Express IOPS charges in favor of local Nitro NVMe SSDs (`i4i.8xlarge`), adopting ElastiCache for Valkey, and optimizing standby RPC failover.
 * [Zero-Cash AWS Blueprint & Production Solana Node Specification](aws/FURLPAY_AWS_FREE_TIER_NODE_CONFIG_REPORT.md)  
-  Running 100% free on AWS via capital stacking (\$25,000–\$100,000 AWS Activate credits + Solana Foundation grants). Contains official Agave v2.2 validator arguments, Linux sysctl tuning (`21-agave-validator.conf`), dual NVMe RAID-0 storage scripts, tmpfs AccountsDB setup, Yellowstone Dragon's Mouth gRPC configuration, and automated slot health monitoring.
+  Running 100% free on AWS via capital stacking ($25,000–$100,000 AWS Activate credits + Solana Foundation grants). Contains official Agave v2.2 validator arguments, Linux sysctl tuning (`21-agave-validator.conf`), dual NVMe RAID-0 storage scripts, tmpfs AccountsDB setup, Yellowstone Dragon's Mouth gRPC configuration, and automated slot health monitoring.
 * [AWS Enterprise Security, Compliance & Infrastructure Blueprint (2026–2027)](aws/FURLPAY_AWS_ENTERPRISE_SECURITY_AND_COMPLIANCE_BLUEPRINT.md)  
   Advanced defense-in-depth architecture covering AWS Organizations multi-account governance, KMS envelope encryption with Nitro Enclave PCR attestation, production Terraform IaC modules (VPC, ECS Fargate, WAF v2), PCI-DSS v4.0 Level 1 / SOC 2 Type II compliance controls, multi-region disaster recovery runbooks, and SRE alerting matrices.
 
 ---
 
-### 2. Security Audits & Vulnerability Assessments (audit/)
+### 3. Security Audits & Vulnerability Assessments (audit/)
 
 * [Master Monorepo Security Audit Report](audit/FULL_CODEBASE_AUDIT_REPORT.md)  
   Exhaustive code audit across Solana Anchor programs, Next.js API routes, Android/Wear OS native applications, and client SDKs. Uncovers and remediates critical vulnerabilities including the Solana escrow token drain in `auto_release.rs`, merchant wallet fallback to `1111...1111`, WooCommerce/Magento HMAC bypass, Swift timing side-channel leaks, and Android SQLite encryption.
@@ -115,7 +138,7 @@ flowchart TD
 
 ---
 
-### 3. Mobile, Wearable & Client Protocols (docs/)
+### 4. Mobile, Wearable & Client Protocols (docs/)
 
 * [Self-Custodial Wallet Architecture](docs/SELF-CUSTODIAL-WALLET-DESIGN.md)  
   BIP-39, SLIP-0010 (Solana Ed25519), and BIP-44 (EVM Secp256k1) key generation, memory zeroization, and multi-account derivation.
@@ -130,7 +153,7 @@ flowchart TD
 
 ---
 
-### 4. Protocols, Settlement & Custody Models (docs/)
+### 5. Protocols, Settlement & Custody Models (docs/)
 
 * [Production Go-Live Money Runbook](docs/GO-LIVE-MONEY.md)  
   Financial operation guidelines, liquidity provisioning, and treasury hot/warm/cold balance thresholds.
@@ -147,7 +170,7 @@ flowchart TD
 
 ---
 
-### 5. Expansion Blueprints & Strategy (reports/)
+### 6. Expansion Blueprints & Strategy (reports/)
 
 * [Singapore Expansion Master Blueprint](reports/furlpay_singapore_expansion_master_blueprint.md)  
   MAS Major Payment Institution (MPI) compliance roadmap, SGQR / PayNow integration, and Southeast Asian cross-border settlement.

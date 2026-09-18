@@ -1,5 +1,8 @@
 * [Home / Overview](README.md)
 
+* **Engineering Blog**
+  * [Scaling Stablecoin Payments (AWS)](blog/scaling-stablecoin-payments-to-millions-aws.md)
+
 * **AWS Infrastructure**
   * [USDC Payment Flow & AWS](aws/FURLPAY_USDC_PAYMENT_FLOW_AND_AWS_ARCHITECTURE.md)
   * [1-Year AWS Migration Blueprint](aws/FURLPAY_1_YEAR_AWS_INFRASTRUCTURE_REPORT.md)

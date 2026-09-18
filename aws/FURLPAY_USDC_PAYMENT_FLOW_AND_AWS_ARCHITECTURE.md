@@ -23,6 +23,14 @@ This document delivers the definitive, end-to-end technical specification for:
 5. **Zero-Trust AWS Nitro Enclaves**: Hardware-isolated transaction signing for gasless fee payers and hot liquidity orchestrators.
 6. **1-Year Phased Implementation Plan (2026–2027)**: A 12-month engineering execution matrix spanning four quarters.
 
+<div align="center">
+
+![FurlPay Master Production Architecture](https://raw.githubusercontent.com/FurlPay/docs/main/assets/furlpay-engineering.png)
+
+*Figure 1: Master Production Architecture — Global Edge Layer, Multi-AZ Private VPC, Dedicated Solana RPC Nodes, Hardware-Isolated Nitro Enclaves, and Institutional Clearing Rails.*
+
+</div>
+
 ```mermaid
 flowchart TD
     subgraph Clients["Client Applications"]
@@ -240,6 +248,16 @@ When a mobile app submits an EIP-3009 transfer:
    - For small transfers ($<\$100$), 1 block confirmation returns HTTP 200 `{ ok: true, transaction: txHash }`.
    - For larger institutional amounts, the route transitions the transaction to `PROCESSING`, returning HTTP 202 `{ ok: false, pending: { transaction: txHash, statusPath: ... } }`.
    - The mobile app displays a clean progress state until the Yellowstone Geyser or EVM block listener confirms required block depth.
+
+---
+
+<div align="center">
+
+![FurlPay On-Chain Financial OS & Payment Rails](https://raw.githubusercontent.com/FurlPay/docs/main/assets/rails-architecture.png)
+
+*Figure 2: FurlPay Payment Rails, Sub-110ms Rain JIT Card Authorization Pipeline, and Circle CCTP Liquidity Architecture.*
+
+</div>
 
 ---
 
