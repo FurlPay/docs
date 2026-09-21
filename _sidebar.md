@@ -10,6 +10,15 @@
   * [Zero-Cash & Production Solana Node](aws/FURLPAY_AWS_FREE_TIER_NODE_CONFIG_REPORT.md)
   * [Enterprise Security & Compliance](aws/FURLPAY_AWS_ENTERPRISE_SECURITY_AND_COMPLIANCE_BLUEPRINT.md)
 
+* **Deployment & Environments**
+  * [Environments (dev / staging / prod)](deploy/ENVIRONMENTS.md)
+  * [AWS Security Baseline](deploy/AWS-SECURITY-BASELINE.md)
+  * [Web — Vercel → AWS](deploy/WEB-AWS.md)
+  * [Android Release](docs/ANDROID-RELEASE.md)
+  * [iOS Release](deploy/IOS-RELEASE.md)
+  * [Wear OS Release](deploy/WEAR-OS-RELEASE.md)
+  * [Play Store Signing](docs/PLAY-SIGNING-RUNBOOK.md)
+
 * **Security & Audits**
   * [Master Monorepo Audit](audit/FULL_CODEBASE_AUDIT_REPORT.md)
   * [Mobile Security Audit](docs/MOBILE_SECURITY_AUDIT.md)
@@ -18,8 +27,6 @@
 
 * **Mobile & Wearables**
   * [Self-Custodial Wallet Design](docs/SELF-CUSTODIAL-WALLET-DESIGN.md)
-  * [Android Release Runbook](docs/ANDROID-RELEASE.md)
-  * [Play Store Signing](docs/PLAY-SIGNING-RUNBOOK.md)
   * [Cert Pin Rotation](docs/CERT-PIN-ROTATION.md)
   * [Hardware Wallets](docs/HARDWARE-WALLET-RESEARCH.md)
 

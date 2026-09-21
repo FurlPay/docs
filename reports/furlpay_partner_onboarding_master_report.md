@@ -411,7 +411,7 @@ To ensure zero PII exposure and bank-grade storage security:
 
 # 5. Security, Privacy & Regulatory Compliance Guardrails
 
-FurlPay enforces mandatory security invariants across every API route and database operation in strict accordance with [`AGENTS.md`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/AGENTS.md):
+FurlPay enforces mandatory security invariants across every API route and database operation in strict accordance with `AGENTS.md`:
 
 ## 5.1 Adherence to `AGENTS.md` Invariants
 1. **Zod Validation on Every Request:** Every POST and PATCH handler parses request bodies through strict Zod schemas defined in `@/lib/schemas` or `@/lib/validate`, enforcing a 100KB payload cap.

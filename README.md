@@ -103,6 +103,40 @@ flowchart TD
 
 ## Master Documentation Index
 
+### 0. Deployment & Environments (deploy/)
+
+Operational runbooks for shipping each surface, and the environment contract
+they all share. Start here if you are moving the platform onto AWS.
+
+* [Environments — development, staging, production](deploy/ENVIRONMENTS.md)  
+  What an environment *is* in this codebase: the `FURLPAY_ENV` financial-mode
+  switch, the Vercel-injected variables that stop existing on AWS (including
+  the one that silently breaks passkeys), the five scheduled jobs, and the
+  managed-service decisions the migration forces.
+
+* [AWS Security Baseline](deploy/AWS-SECURITY-BASELINE.md)  
+  The controls that gate a go-live: multi-account topology with SCP
+  boundaries, IAM Identity Center with no IAM users, Secrets Manager, KMS and
+  Nitro Enclave key custody, detection, supply chain, and a go-live checklist.
+
+* [Web — Vercel → AWS](deploy/WEB-AWS.md)  
+  ECS Fargate behind CloudFront for 314 API routes and 219 pages; why not
+  Amplify, Lambda or App Runner; EventBridge for the crons; the cutover and
+  rollback plan.
+
+* [Android Release Runbook](docs/ANDROID-RELEASE.md) · [Play Store Signing](docs/PLAY-SIGNING-RUNBOOK.md)  
+  EAS builds, keystore custody, and the Play App Signing step.
+
+* [iOS Release Runbook](deploy/IOS-RELEASE.md)  
+  Currently blocked on an Apple Developer account. Covers the SDK floor, the
+  watchOS and widget targets, and what App Store review asks a financial app.
+
+* [Wear OS Release Runbook](deploy/WEAR-OS-RELEASE.md)  
+  Why the watch app shares the phone's `applicationId`, same-key signing, and
+  the fingerprint registration that passkeys depend on.
+
+---
+
 ### 1. Engineering Blog & Technical Articles (blog/)
 
 * [Scaling Stablecoin Payments to Millions: Why We Migrated FurlPay from Shared RPCs to Dedicated AWS Infrastructure](blog/scaling-stablecoin-payments-to-millions-aws.md)  

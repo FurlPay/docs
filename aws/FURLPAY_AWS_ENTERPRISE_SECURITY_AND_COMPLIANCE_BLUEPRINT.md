@@ -4,10 +4,10 @@
 **Published:** September 18, 2026  
 **Authors:** FurlPay Security Operations, Cloud Infrastructure & Compliance Engineering Teams  
 **Companion Documents:**
-- Master AWS Blueprint: [`docs/FURLPAY_1_YEAR_AWS_INFRASTRUCTURE_REPORT.md`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/docs/FURLPAY_1_YEAR_AWS_INFRASTRUCTURE_REPORT.md)
-- AWS FinOps & Cost Optimization: [`docs/FURLPAY_AWS_COST_OPTIMIZATION_REPORT.md`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/docs/FURLPAY_AWS_COST_OPTIMIZATION_REPORT.md)
-- Zero-Cash & Node Specification: [`docs/FURLPAY_AWS_FREE_TIER_NODE_CONFIG_REPORT.md`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/docs/FURLPAY_AWS_FREE_TIER_NODE_CONFIG_REPORT.md)
-- Cross-Platform USDC Payment Architecture: [`docs/FURLPAY_USDC_PAYMENT_FLOW_AND_AWS_ARCHITECTURE.md`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/docs/FURLPAY_USDC_PAYMENT_FLOW_AND_AWS_ARCHITECTURE.md)
+- Master AWS Blueprint: [`docs/FURLPAY_1_YEAR_AWS_INFRASTRUCTURE_REPORT.md`](./FURLPAY_1_YEAR_AWS_INFRASTRUCTURE_REPORT.md)
+- AWS FinOps & Cost Optimization: [`docs/FURLPAY_AWS_COST_OPTIMIZATION_REPORT.md`](./FURLPAY_AWS_COST_OPTIMIZATION_REPORT.md)
+- Zero-Cash & Node Specification: [`docs/FURLPAY_AWS_FREE_TIER_NODE_CONFIG_REPORT.md`](./FURLPAY_AWS_FREE_TIER_NODE_CONFIG_REPORT.md)
+- Cross-Platform USDC Payment Architecture: [`docs/FURLPAY_USDC_PAYMENT_FLOW_AND_AWS_ARCHITECTURE.md`](./FURLPAY_USDC_PAYMENT_FLOW_AND_AWS_ARCHITECTURE.md)
 
 ---
 
@@ -409,10 +409,10 @@ To satisfy financial banking partners (Rain, Circle) and enterprise institutiona
 | PCI-DSS Requirement | FurlPay AWS Technical Control | Evidence Location |
 | :--- | :--- | :--- |
 | **Req 1: Network Security Controls** | Strict VPC subnet isolation. Inbound webhooks from Rain only accept traffic from designated CIDRs terminating at ALB with TLS 1.3. | `vpc.tf`, Security Group `sg-rain-webhook`. |
-| **Req 3: Protect Stored Account Data** | No Primary Account Numbers (PANs) or CVVs stored in databases. Virtual and physical card numbers are proxied ephemerally; only tokenized `card_id` and `last4` persisted. | [`apps/web/src/app/api/webhooks/card-auth/route.ts`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/apps/web/src/app/api/webhooks/card-auth/route.ts). |
-| **Req 4: Strong Cryptography in Transit** | Pinned TLS 1.3 encryption on ALB, CloudFront, and internal VPC communication. Swift and Kotlin clients enforce certificate pinning. | [`docs/CERT-PIN-ROTATION.md`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/docs/CERT-PIN-ROTATION.md). |
+| **Req 3: Protect Stored Account Data** | No Primary Account Numbers (PANs) or CVVs stored in databases. Virtual and physical card numbers are proxied ephemerally; only tokenized `card_id` and `last4` persisted. | `apps/web/src/app/api/webhooks/card-auth/route.ts`. |
+| **Req 4: Strong Cryptography in Transit** | Pinned TLS 1.3 encryption on ALB, CloudFront, and internal VPC communication. Swift and Kotlin clients enforce certificate pinning. | [`docs/CERT-PIN-ROTATION.md`](../docs/CERT-PIN-ROTATION.md). |
 | **Req 10: Log & Monitor All Access** | CloudTrail logs streamed to an immutable S3 bucket with Object Lock in Compliance Mode. GuardDuty continuously analyzes VPC flow logs. | AWS Security Account, `CloudTrailLake`. |
-| **Req 12: Information Security Policy** | Formal security rules pinned in codebase; CI deployment gate enforces passing audits prior to release. | [`AGENTS.md`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/AGENTS.md), `check-deploy-gate.mjs`. |
+| **Req 12: Information Security Policy** | Formal security rules pinned in codebase; CI deployment gate enforces passing audits prior to release. | `AGENTS.md`, `check-deploy-gate.mjs`. |
 
 ### 5.2 SOC 2 Type II Trust Services Criteria
 

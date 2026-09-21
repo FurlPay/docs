@@ -3,7 +3,7 @@
 
 **Published:** September 18, 2026  
 **Author:** FurlPay Infrastructure & FinOps Architecture Team  
-**Companion Blueprint:** [`docs/FURLPAY_1_YEAR_AWS_INFRASTRUCTURE_REPORT.md`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/docs/FURLPAY_1_YEAR_AWS_INFRASTRUCTURE_REPORT.md)  
+**Companion Blueprint:** [`docs/FURLPAY_1_YEAR_AWS_INFRASTRUCTURE_REPORT.md`](./FURLPAY_1_YEAR_AWS_INFRASTRUCTURE_REPORT.md)  
 **Objective:** Deliver an exhaustive financial and technical audit of the 1-Year AWS Migration Blueprint, identify key cost drivers, eliminate architectural waste, and provide a hardened, production-grade deployment plan that slashes annual operational expenses from **\$44,040/year** down to **\$21,480/year (51.2% reduction)** or **\$11,880/year (73% reduction)** with AWS Activate startup credits.
 
 ---

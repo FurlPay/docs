@@ -4,10 +4,10 @@
 **Published:** September 18, 2026  
 **Authors:** FurlPay Core Protocols, Mobile Engineering & Cloud Infrastructure Architecture Teams  
 **Companion Documents:**
-- Master AWS Blueprint: [`docs/FURLPAY_1_YEAR_AWS_INFRASTRUCTURE_REPORT.md`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/docs/FURLPAY_1_YEAR_AWS_INFRASTRUCTURE_REPORT.md)
-- AWS FinOps & Cost Reduction: [`docs/FURLPAY_AWS_COST_OPTIMIZATION_REPORT.md`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/docs/FURLPAY_AWS_COST_OPTIMIZATION_REPORT.md)
-- Zero-Cash & Node Specification: [`docs/FURLPAY_AWS_FREE_TIER_NODE_CONFIG_REPORT.md`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/docs/FURLPAY_AWS_FREE_TIER_NODE_CONFIG_REPORT.md)
-- Full Monorepo Audit: [`audit/FULL_CODEBASE_AUDIT_REPORT.md`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/audit/FULL_CODEBASE_AUDIT_REPORT.md)
+- Master AWS Blueprint: [`docs/FURLPAY_1_YEAR_AWS_INFRASTRUCTURE_REPORT.md`](./FURLPAY_1_YEAR_AWS_INFRASTRUCTURE_REPORT.md)
+- AWS FinOps & Cost Reduction: [`docs/FURLPAY_AWS_COST_OPTIMIZATION_REPORT.md`](./FURLPAY_AWS_COST_OPTIMIZATION_REPORT.md)
+- Zero-Cash & Node Specification: [`docs/FURLPAY_AWS_FREE_TIER_NODE_CONFIG_REPORT.md`](./FURLPAY_AWS_FREE_TIER_NODE_CONFIG_REPORT.md)
+- Full Monorepo Audit: [`audit/FULL_CODEBASE_AUDIT_REPORT.md`](../audit/FULL_CODEBASE_AUDIT_REPORT.md)
 
 ---
 
@@ -87,11 +87,11 @@ The FurlPay client footprint spans three distinct layers:
 #### 2.1.1 Self-Custody Cryptographic Key Lifecycle
 The user's self-custody wallet is initialized from a 12- or 24-word BIP-39 mnemonic phrase.
 - **Key Derivation**:
-  - **Solana Keypair**: Derived using **SLIP-0010** Ed25519 derivation at path `m/44'/501'/0'/0'` ([`native-app/lib/solana/slip10.ts`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/native-app/lib/solana/slip10.ts) and [`native-app/lib/solana/wallet.ts`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/native-app/lib/solana/wallet.ts)).
-  - **EVM Keypair (Base, Arbitrum, Ethereum, Polygon)**: Derived using **BIP-44** Secp256k1 derivation at path `m/44'/60'/0'/0/0` ([`native-app/lib/wallet.ts`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/native-app/lib/wallet.ts)).
+  - **Solana Keypair**: Derived using **SLIP-0010** Ed25519 derivation at path `m/44'/501'/0'/0'` (`native-app/lib/solana/slip10.ts` and `native-app/lib/solana/wallet.ts`).
+  - **EVM Keypair (Base, Arbitrum, Ethereum, Polygon)**: Derived using **BIP-44** Secp256k1 derivation at path `m/44'/60'/0'/0/0` (`native-app/lib/wallet.ts`).
 - **Hardware Storage & Zeroization**:
   - Keys are stored in `expo-secure-store`, backed on Android by the **AndroidKeyStore** with `requireAuthentication: true` and `keychainAccessible: WHEN_UNLOCKED_THIS_DEVICE_ONLY`.
-  - In-memory private key exposure is minimized to single-digit milliseconds: the secret key bytes exist only during the signing function call, immediately wrapped in a `try...finally` block that invokes `.fill(0)` on the underlying `Uint8Array` ([`native-app/lib/solana/transfer.ts#L263`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/native-app/lib/solana/transfer.ts#L263) and [`native-app/lib/wallet.ts#L173`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/native-app/lib/wallet.ts#L173)).
+  - In-memory private key exposure is minimized to single-digit milliseconds: the secret key bytes exist only during the signing function call, immediately wrapped in a `try...finally` block that invokes `.fill(0)` on the underlying `Uint8Array` (`native-app/lib/solana/transfer.ts#L263` and `native-app/lib/wallet.ts#L173`).
 
 #### 2.1.2 Gasless USDC Payments (EIP-3009 `transferWithAuthorization`)
 For EVM networks (Arbitrum One, Base, Polygon PoS), FurlPay eliminates the requirement for users to hold native ETH or POL.
@@ -101,7 +101,7 @@ For EVM networks (Arbitrum One, Base, Polygon PoS), FurlPay eliminates the requi
   - **Polygon**: `0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359`
   - **Ethereum Mainnet**: `0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48`
 - **Execution Flow**:
-  1. **Quote Request**: Client calls `GET /api/transfers/gasless` to fetch active fee-payer relayer parameters, verifying that the quote specifies `USDC` with exactly 6 decimals ([`native-app/lib/wallet.ts#L658`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/native-app/lib/wallet.ts#L658)).
+  1. **Quote Request**: Client calls `GET /api/transfers/gasless` to fetch active fee-payer relayer parameters, verifying that the quote specifies `USDC` with exactly 6 decimals (`native-app/lib/wallet.ts#L658`).
   2. **Atomic Amount Scaling**: Client invokes `parseUsdcAmount(amountUsd)` to scale dollars to atomic units ($1.00 \rightarrow 1,000,000$ base units), rejecting floating-point imprecision and truncation.
   3. **Authorization Payload Construction**:
      ```typescript
@@ -116,7 +116,7 @@ For EVM networks (Arbitrum One, Base, Polygon PoS), FurlPay eliminates the requi
      };
      ```
   4. **Biometric Gate & EIP-712 Signing**:
-     - Client prompts biometric confirmation via `authorizeMoneyMove()` ([`native-app/lib/money/authorize.ts`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/native-app/lib/money/authorize.ts)).
+     - Client prompts biometric confirmation via `authorizeMoneyMove()` (`native-app/lib/money/authorize.ts`).
      - Hashes typed data under EIP-712 domain:
        `{ name: "USD Coin", version: "2", chainId: networkChainId, verifyingContract: usdcContractAddress }`.
      - Derives Secp256k1 signature `(r, s, v)` locally.
@@ -126,17 +126,17 @@ For EVM networks (Arbitrum One, Base, Polygon PoS), FurlPay eliminates the requi
 On Solana, FurlPay processes USDC (`EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v`) with sub-second finality.
 - **Associated Token Account (ATA) Idempotence**:
   - The sender specifies the recipient's **wallet owner address**, not token address.
-  - The client queries the AWS-hosted Solana RPC node for the recipient's ATA. If absent, the transaction automatically prepends a `createAssociatedTokenAccountIdempotentInstruction` with 2,039,280 lamports rent funded by the sender ([`native-app/lib/solana/transfer.ts#L154`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/native-app/lib/solana/transfer.ts#L154)).
+  - The client queries the AWS-hosted Solana RPC node for the recipient's ATA. If absent, the transaction automatically prepends a `createAssociatedTokenAccountIdempotentInstruction` with 2,039,280 lamports rent funded by the sender (`native-app/lib/solana/transfer.ts#L154`).
 - **TransferChecked Instruction**:
   - All transfers utilize `createTransferCheckedInstruction` specifying the mint public key and 6 decimals. This ensures the Solana runtime will abort if there is a decimals mismatch or wrong-mint substitution.
 - **Resolution of the v0 Message Serialization Gap**:
-  - Currently in [`native-app/lib/solana/transfer.ts#L283`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/native-app/lib/solana/transfer.ts#L283), `serializeTransaction` throws an error pending complete account ordering.
+  - Currently in `native-app/lib/solana/transfer.ts#L283`, `serializeTransaction` throws an error pending complete account ordering.
   - **The Solution Implemented in the 1-Year Plan**: The mobile client incorporates `@solana/web3.js` Versioned Transactions (`TransactionMessage.compileToV0Message`), producing a compact-u16 serialized v0 message signed locally with Ed25519 and dispatched directly to the AWS dedicated RPC node.
 
 #### 2.1.4 Resilient Offline Queueing & Outbox Synchronization
 To guarantee zero dropped transactions during mobile cell handoffs or subway connectivity gaps:
 - When a network call fails with `NetworkError` or `TimeoutError`, the transaction is not abandoned.
-- It is saved locally in SQLite via `queuePendingAction()` ([`native-app/lib/db.ts`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/native-app/lib/db.ts)) with its cryptographically stable `Idempotency-Key` ([`native-app/lib/send/useSend.ts#L405`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/native-app/lib/send/useSend.ts#L405)).
+- It is saved locally in SQLite via `queuePendingAction()` (`native-app/lib/db.ts`) with its cryptographically stable `Idempotency-Key` (`native-app/lib/send/useSend.ts#L405`).
 - When internet connectivity returns, the background sync worker flushes the queue. The backend ElastiCache/Aurora deduplication ensures that replayed requests return the exact same settlement confirmation without double-debiting.
 
 ---
@@ -146,28 +146,28 @@ To guarantee zero dropped transactions during mobile cell handoffs or subway con
 The FurlPay Guardian app (`com.furlpay.guardian`) is built natively in Kotlin 2.1 and Jetpack Compose for Wear OS, functioning as an ultra-secure hardware companion.
 
 #### 2.2.1 Secure Hardware Keystore & Token Storage
-- Hardware security is enforced via `KeystoreTokenStore.kt` ([`guardian/app/mobile/src/main/kotlin/com/furlpay/guardian/mobile/security/KeystoreTokenStore.kt`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/guardian/app/mobile/src/main/kotlin/com/furlpay/guardian/mobile/security/KeystoreTokenStore.kt)).
+- Hardware security is enforced via `KeystoreTokenStore.kt` (`guardian/app/mobile/src/main/kotlin/com/furlpay/guardian/mobile/security/KeystoreTokenStore.kt`).
 - Generates an AES-256-GCM master key inside the hardware-backed **AndroidKeyStore** with `PURPOSE_ENCRYPT or PURPOSE_DECRYPT`.
 - Session tokens transferred to the watch over Bluetooth/Wi-Fi are encrypted at rest on the smartwatch flash storage.
 
 #### 2.2.2 Google Play Integrity API & PCI MPoC Attestation
 For contactless point-of-sale acceptance (Tap to Pay):
 - Android does not offer iOS's hardware entitlement gates for NFC POS mode. Any sideloaded APK could theoretically request NFC read privileges.
-- Under **PCI MPoC (Mobile Payments on COTS)** standards, `DeviceIntegrity.kt` ([`guardian/app/mobile/src/main/kotlin/com/furlpay/guardian/mobile/taptopay/DeviceIntegrity.kt`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/guardian/app/mobile/src/main/kotlin/com/furlpay/guardian/mobile/taptopay/DeviceIntegrity.kt)) enforces that:
+- Under **PCI MPoC (Mobile Payments on COTS)** standards, `DeviceIntegrity.kt` (`guardian/app/mobile/src/main/kotlin/com/furlpay/guardian/mobile/taptopay/DeviceIntegrity.kt`) enforces that:
   1. The backend server generates a single-use cryptographic `nonce`.
   2. The Android client calls Google Play Integrity API with the nonce.
   3. The resulting attestation token is transmitted to the AWS backend for server-side verification against Google's API, asserting `MEETS_STRONG_INTEGRITY` (bootloader locked, unmodified certified OEM OS, hardware-backed Keystore).
   4. Only upon successful server attestation does the backend issue ephemeral keys enabling contactless payment acceptance.
 
 #### 2.2.3 Wearable Data Layer Synchronization (`SyncCoordinator.kt`)
-The phone and smartwatch communicate via Google Play Services Wearable Data Layer (`putJson` protocol) ([`guardian/app/mobile/src/main/kotlin/com/furlpay/guardian/mobile/SyncCoordinator.kt`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/guardian/app/mobile/src/main/kotlin/com/furlpay/guardian/mobile/SyncCoordinator.kt)):
+The phone and smartwatch communicate via Google Play Services Wearable Data Layer (`putJson` protocol) (`guardian/app/mobile/src/main/kotlin/com/furlpay/guardian/mobile/SyncCoordinator.kt`):
 - **Real-Time Data Streams**:
   - `DATA_WALLET`: Active USDC spendable balance and recent transactions.
   - `DATA_EVENTS`: Security alert feed and biometric step-up challenges.
   - `DATA_TRIPS` & `DATA_PORTFOLIO`: Travel card spend limits and currency exchange rates.
 - **QuickPay Wrist QR Generation (`QuickPayScreen.kt`)**:
   - Renders dynamic SGQR / Solana Pay QR codes directly on the smartwatch OLED display.
-  - Sets `WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON` and pins screen brightness to 100% while the QR is visible to eliminate scanner optical misreads ([`guardian/app/wear/src/main/kotlin/com/furlpay/guardian/wear/ui/QuickPayScreen.kt#L68`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/guardian/app/wear/src/main/kotlin/com/furlpay/guardian/wear/ui/QuickPayScreen.kt#L68)).
+  - Sets `WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON` and pins screen brightness to 100% while the QR is visible to eliminate scanner optical misreads (`guardian/app/wear/src/main/kotlin/com/furlpay/guardian/wear/ui/QuickPayScreen.kt#L68`).
   - Encodes 102k pixel barcodes off the main Android UI thread using ZXing on `Dispatchers.Default`.
 - **Wrist Emergency Card Freeze (`CardsScreen.kt`)**:
   - Users can freeze virtual and physical Rain debit cards with a double-tap on their watch.
@@ -231,12 +231,12 @@ flowchart TD
 
 When a mobile app submits an EIP-3009 transfer:
 1. **Network Authentication & Zod Body Validation**:
-   - The route enforces `requireUser(req)` and validates the body schema using strict Zod types ([`apps/web/src/app/api/transfers/gasless/route.ts#L57`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/apps/web/src/app/api/transfers/gasless/route.ts#L57)).
+   - The route enforces `requireUser(req)` and validates the body schema using strict Zod types (`apps/web/src/app/api/transfers/gasless/route.ts#L57`).
    - Enforces body size cap ($<100\text{ KB}$) and per-user mutating rate limits via `rateLimitOr429(req, "transfers-gasless", { limit: 12, windowMs: 60_000 })`.
 2. **Distributed Nonce Deduplication in Valkey**:
    - Executes an atomic SET-if-Not-Exists (`kvSetNx`) against Amazon ElastiCache for Valkey:
      `kvSetNx('x402:nonce:${authorization.nonce}', currentEpochTime, 86400)`.
-   - If the key already exists, the server immediately aborts with HTTP 409 `replay_rejected`, blocking replay attacks across all serverless containers and network retries ([`apps/web/src/app/api/transfers/gasless/route.ts#L105`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/apps/web/src/app/api/transfers/gasless/route.ts#L105)).
+   - If the key already exists, the server immediately aborts with HTTP 409 `replay_rejected`, blocking replay attacks across all serverless containers and network retries (`apps/web/src/app/api/transfers/gasless/route.ts#L105`).
 3. **Cryptographic EIP-712 Verification**:
    - Recovers the signer address from the Secp256k1 signature and asserts that `recoveredAddress === authorization.from`.
    - Validates timestamps: `authorization.validAfter <= now <= authorization.validBefore`.
@@ -443,13 +443,13 @@ sequenceDiagram
 
 | Attack Vector | Threat Level | Vulnerability Mechanism | FurlPay AWS & Codebase Mitigation |
 | :--- | :--- | :--- | :--- |
-| **Signature Replay** | Critical | Attacker intercepts EIP-3009 authorization and resubmits to drain wallet | **Atomic Nonce Burning**: Every nonce is claimed via `kvSetNx` in ElastiCache Valkey with 24h TTL *before* execution. Replays fail with HTTP 409 ([`apps/web/src/app/api/transfers/gasless/route.ts#L105`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/apps/web/src/app/api/transfers/gasless/route.ts#L105)). |
+| **Signature Replay** | Critical | Attacker intercepts EIP-3009 authorization and resubmits to drain wallet | **Atomic Nonce Burning**: Every nonce is claimed via `kvSetNx` in ElastiCache Valkey with 24h TTL *before* execution. Replays fail with HTTP 409 (`apps/web/src/app/api/transfers/gasless/route.ts#L105`). |
 | **Relayer Key Extraction** | Critical | Cloud host compromise or memory dump exposing private keys paying gas | **AWS Nitro Enclaves**: Relayer keys decrypted inside hardware-isolated enclaves via KMS Cryptographic Attestation (`PCR0`). Plaintext keys never touch host OS or disks. |
 | **Rain JIT Timing Attack** | High | Visa webhook times out ($>200\text{ms}$), resulting in declined card transactions | **Sub-110ms Valkey In-Memory Engine**: In-memory balance checking and atomic holds via Lua scripts execute in $<8\text{ms}$. Webhook responds immediately; on-chain clearing is decoupled asynchronously. |
-| **Rogue Token Substitution** | Critical | Attacker creates spoofed "USDC" mint with fake balances | **Mint Address Pinned Validation**: Token mints are hard-pinned in code (`EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v`). `TransferChecked` instructions enforce mint address and 6 decimals on-chain ([`apps/web/src/lib/actions/solana.ts#L242`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/apps/web/src/lib/actions/solana.ts#L242)). |
-| **Mobile Biometric Bypass** | High | User disables biometrics in app settings, allowing rogue local transactions | **Enforced Risk Engine (`authorizeMoneyMove`)**: No preference escape hatch. Money-moving operations mandate Class 3 biometrics or device PIN proof of presence ([`native-app/lib/solana/transfer.ts#L205`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/native-app/lib/solana/transfer.ts#L205)). |
-| **Tampered Android APK** | High | Rooted or instrumented Android device intercepts NFC tap-to-pay | **Google Play Integrity API**: Verified against Google attestation servers before issuing ephemeral contactless acceptance tokens ([`guardian/app/mobile/src/main/kotlin/com/furlpay/guardian/mobile/taptopay/DeviceIntegrity.kt`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/guardian/app/mobile/src/main/kotlin/com/furlpay/guardian/mobile/taptopay/DeviceIntegrity.kt)). |
-| **Webhook Timing Side-Channel**| Medium | Attacker determines webhook HMAC secret through character-by-character response timings | **Constant-Time Verification**: All webhook handlers (Rain, Circle, Swift SDK) enforce `crypto.timingSafeEqual` over raw SHA-256 HMAC digests ([`AGENTS.md` Rule 3](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/AGENTS.md)). |
+| **Rogue Token Substitution** | Critical | Attacker creates spoofed "USDC" mint with fake balances | **Mint Address Pinned Validation**: Token mints are hard-pinned in code (`EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v`). `TransferChecked` instructions enforce mint address and 6 decimals on-chain (`apps/web/src/lib/actions/solana.ts#L242`). |
+| **Mobile Biometric Bypass** | High | User disables biometrics in app settings, allowing rogue local transactions | **Enforced Risk Engine (`authorizeMoneyMove`)**: No preference escape hatch. Money-moving operations mandate Class 3 biometrics or device PIN proof of presence (`native-app/lib/solana/transfer.ts#L205`). |
+| **Tampered Android APK** | High | Rooted or instrumented Android device intercepts NFC tap-to-pay | **Google Play Integrity API**: Verified against Google attestation servers before issuing ephemeral contactless acceptance tokens (`guardian/app/mobile/src/main/kotlin/com/furlpay/guardian/mobile/taptopay/DeviceIntegrity.kt`). |
+| **Webhook Timing Side-Channel**| Medium | Attacker determines webhook HMAC secret through character-by-character response timings | **Constant-Time Verification**: All webhook handlers (Rain, Circle, Swift SDK) enforce `crypto.timingSafeEqual` over raw SHA-256 HMAC digests (`AGENTS.md`). |
 
 ---
 
@@ -494,10 +494,10 @@ OCT        NOV        DEC        JAN        FEB        MAR        APR        MAY
 ## 7. Immediate Next Steps & Engineering Action Items
 
 1. **Unblock Solana v0 Message Serialization**:
-   - Implement the complete Solana v0 message compiler in [`native-app/lib/solana/transfer.ts`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/native-app/lib/solana/transfer.ts), eliminating the current exception in `serializeTransaction`.
+   - Implement the complete Solana v0 message compiler in `native-app/lib/solana/transfer.ts`, eliminating the current exception in `serializeTransaction`.
 2. **Apply Security Hotfixes from Master Monorepo Audit**:
-   - Resolve escrow token account auto-release in Solana Anchor program [`programs/furlpay/src/instructions/auto_release.rs`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/programs/furlpay/src/instructions/auto_release.rs).
-   - Enforce constant-time comparison in Swift webhook verifier [`furlpay-swift/Sources/FurlPay/Webhooks/WebhookVerifier.swift`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/furlpay-swift/Sources/FurlPay/Webhooks/WebhookVerifier.swift).
+   - Resolve escrow token account auto-release in Solana Anchor program `programs/furlpay/src/instructions/auto_release.rs`.
+   - Enforce constant-time comparison in Swift webhook verifier `furlpay-swift/Sources/FurlPay/Webhooks/WebhookVerifier.swift`.
 3. **Provision AWS Devnet Staging Environment**:
    - Initialize AWS Terraform repository with Multi-AZ VPC, ECS Fargate cluster, and ElastiCache for Valkey.
    - Deploy first Agave v2.2 testnet RPC node to validate Yellowstone gRPC Geyser integration.

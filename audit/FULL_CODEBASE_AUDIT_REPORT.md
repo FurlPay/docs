@@ -71,7 +71,7 @@ The repository contains two primary active Android/mobile components, plus suppo
   - Reflection rules preserve WebAuthn/Passkeys (`androidx.credentials`, `com.google.android.gms.fido`) and SQLite/MapLibre JNI descriptors.
 - **Signing Pipeline (`native-app/build-android.sh`):**
   - Protects against Expo's default debug signing in release builds by injecting `android.injected.signing.*` properties at build time.
-  - Signing keystore and credentials reside in an external directory (`C:/Users/ashut/.furlpay-signing`), preventing accidental repository commits.
+  - Signing keystore and credentials reside in an external directory (`~/.furlpay-signing` (outside the repository)), preventing accidental repository commits.
 
 #### C. FurlPay Guardian — Kotlin Native & Wear OS (`guardian/`)
 - **Architecture:** 8 clean modules separating domain, network, security, sync, and UI.
@@ -90,7 +90,7 @@ The repository contains two primary active Android/mobile components, plus suppo
 The Solana program manages buyer-merchant escrows with automatic release timeouts and dispute mechanisms. Significant vulnerabilities were identified in the account validation logic:
 
 #### Vulnerability Analysis: VULN-01 & VULN-02 (Arbitrary Token Withdrawal)
-**Location:** [instructions/auto_release.rs](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/furlpay-programs/programs/furlpay-escrow/src/instructions/auto_release.rs#L6-L25) and [instructions/release_escrow.rs](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/furlpay-programs/programs/furlpay-escrow/src/instructions/release_escrow.rs#L7-L28)
+**Location:** `furlpay-programs/programs/furlpay-escrow/src/instructions/auto_release.rs#L6-L25` and `furlpay-programs/programs/furlpay-escrow/src/instructions/release_escrow.rs#L7-L28`
 
 **Vulnerable Code in `AutoRelease`:**
 ```rust
@@ -149,7 +149,7 @@ pub merchant_token_account: Account<'info, TokenAccount>,
 - **Baseline Rate Limiting:** Applied to all mutating requests (150 req/min/IP) using Redis `kvIncr` sliding window, failing open gracefully during KV disruptions.
 
 #### B. API Rate Limiter IP Extraction (`apps/web/src/lib/rateLimit.ts`)
-**Location:** [lib/rateLimit.ts:87-93](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/apps/web/src/lib/rateLimit.ts#L87-L93)
+**Location:** `apps/web/src/lib/rateLimit.ts#L87-L93`
 ```ts
 export function clientIp(req: NextRequest | undefined): string {
   return (
@@ -163,7 +163,7 @@ export function clientIp(req: NextRequest | undefined): string {
 When deployed in environments where `x-real-ip` is not set or when upstream proxies append client IPs to the right, reading `split(",")[0]` selects the client-controlled leftmost IP. An attacker can supply a spoofed `X-Forwarded-For: <random-ip>` header to bypass IP-based rate limiting on sensitive routes (e.g. OTP initiation, fee checks).
 
 #### C. Solana Actions Merchant Address Fallback (`apps/web/src/lib/actions/solana.ts`)
-**Location:** [lib/actions/solana.ts:169-173](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/apps/web/src/lib/actions/solana.ts#L169-L173)
+**Location:** `apps/web/src/lib/actions/solana.ts#L169-L173`
 ```ts
 function merchantWallet(): PublicKey {
   const configured = process.env.MERCHANT_SOLANA_WALLET;
@@ -184,7 +184,7 @@ if (!configured) {
 ```
 
 #### D. Content Security Policy (`apps/web/next.config.js`)
-**Location:** [next.config.js:12](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/apps/web/next.config.js#L12)
+**Location:** `apps/web/next.config.js#L12`
 `script-src` includes `'unsafe-eval'`. While frequently used in development toolchains, leaving `'unsafe-eval'` in production weakens browser defenses against DOM-based XSS attacks.
 
 ---

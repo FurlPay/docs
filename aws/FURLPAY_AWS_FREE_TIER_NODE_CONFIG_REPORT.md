@@ -4,8 +4,8 @@
 **Published:** September 18, 2026  
 **Author:** FurlPay Infrastructure & FinOps Architecture Team  
 **Companion Documents:**
-- [`docs/FURLPAY_1_YEAR_AWS_INFRASTRUCTURE_REPORT.md`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/docs/FURLPAY_1_YEAR_AWS_INFRASTRUCTURE_REPORT.md)
-- [`docs/FURLPAY_AWS_COST_OPTIMIZATION_REPORT.md`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/docs/FURLPAY_AWS_COST_OPTIMIZATION_REPORT.md)
+- [`docs/FURLPAY_1_YEAR_AWS_INFRASTRUCTURE_REPORT.md`](./FURLPAY_1_YEAR_AWS_INFRASTRUCTURE_REPORT.md)
+- [`docs/FURLPAY_AWS_COST_OPTIMIZATION_REPORT.md`](./FURLPAY_AWS_COST_OPTIMIZATION_REPORT.md)
 
 ---
 

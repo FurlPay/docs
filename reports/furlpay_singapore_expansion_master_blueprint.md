@@ -132,7 +132,7 @@ For Singapore citizens, Permanent Residents, and Employment Pass holders, manual
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-*Implementation Detail:* FurlPay implements a dual-mode connector in [`lib/compliance/singpass.ts`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/apps/web/src/lib/compliance/singpass.ts):
+*Implementation Detail:* FurlPay implements a dual-mode connector in `apps/web/src/lib/compliance/singpass.ts`:
 - Direct Singpass v5 integration for native Singapore entity deployment.
 - Persona Singpass API adapter for immediate turnkey onboarding without waiting for government relying-party portal review.
 
@@ -199,7 +199,7 @@ Here is the exact technical blueprint for integrating each competitor's core cap
 ## 3.5 dtcpay: Retail SGQR In-Store Payments & Instant Crypto Swaps
 * **Competitor Benchmark:** dtcpay enables Singapore retail merchants to accept crypto via POS terminals and QR codes.
 * **FurlPay Implementation:**
-  1. **Dynamic SGQR Generator & Scanner:** FurlPay app includes a native SGQR parser and generator in [`lib/rails/singapore/sgqr.ts`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/apps/web/src/lib/rails/singapore/sgqr.ts).
+  1. **Dynamic SGQR Generator & Scanner:** FurlPay app includes a native SGQR parser and generator in `apps/web/src/lib/rails/singapore/sgqr.ts`.
   2. **In-Store PayNow QR Payments:** A user or traveler walking into a Singapore hawker centre or luxury boutique can open FurlPay, scan any standard **PayNow / NETS / SGQR** code, and pay with **USDC or XSGD**. FurlPay auto-converts the crypto to SGD and dispatches a FAST transfer to the merchant's UEN in real-time.
 
 ---
