@@ -9,7 +9,8 @@
 **Companion documents:** [Environments](../deploy/ENVIRONMENTS.md) ·
 [Web: Vercel → AWS](../deploy/WEB-AWS.md) ·
 [AWS Security Baseline](../deploy/AWS-SECURITY-BASELINE.md) ·
-[1-Year Migration Blueprint](FURLPAY_1_YEAR_AWS_INFRASTRUCTURE_REPORT.md)
+[1-Year Migration Blueprint](FURLPAY_1_YEAR_AWS_INFRASTRUCTURE_REPORT.md) ·
+[TOKEN2049 Engagement Log](TOKEN2049-AWS-ENGAGEMENT-LOG.md)
 
 ---
 
@@ -145,6 +146,18 @@ depending on choices. That is a model, not a bill.
 3. Whether migration funding applies to a move from Vercel to AWS.
 4. Access to Claude on Amazon Bedrock, and confirmation that credits apply.
 5. A named contact for follow-up architecture questions during the migration.
+
+---
+
+## 5. Active AWS relationship
+
+On 7 October 2026 FurlPay attended **The Agentic Mixer: Build, Fund, Scale**,
+a TOKEN2049 Singapore side event co-hosted by AWS Startups and Animoca Brands.
+A working relationship was established with Cyrus Fang (`fangzy@amazon.com`),
+AWS Startups BD in Singapore. Discussions about Activate credits, Bedrock
+access and go-to-market support are active.
+
+Full timeline and call-preparation notes: [TOKEN2049 Engagement Log](TOKEN2049-AWS-ENGAGEMENT-LOG.md).
 
 ---
 

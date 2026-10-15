@@ -10,6 +10,7 @@
   * [AWS Cost Model](aws/FURLPAY_AWS_COST_OPTIMIZATION_REPORT.md)
   * [Credits Plan & Solana Node Spec](aws/FURLPAY_AWS_FREE_TIER_NODE_CONFIG_REPORT.md)
   * [Enterprise Security & Compliance](aws/FURLPAY_AWS_ENTERPRISE_SECURITY_AND_COMPLIANCE_BLUEPRINT.md)
+  * [TOKEN2049 AWS Engagement Log](aws/TOKEN2049-AWS-ENGAGEMENT-LOG.md)
 
 * **Cards**
   * [Virtual Card JIT Rails Plan](docs/VIRTUAL-CARD-JIT-RAILS-PLAN.md)

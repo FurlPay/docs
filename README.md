@@ -35,7 +35,7 @@ Enterprise-grade technical documentation, AWS cloud migration roadmaps, dedicate
 | **Database** | **Supabase Postgres**, reached through PostgREST over HTTP | Aurora PostgreSQL is not a drop-in replacement; see the [engagement brief](aws/AWS-ENGAGEMENT-BRIEF.md) |
 | **Key-value store** | **Upstash Redis** (REST), which holds passkeys, API keys and OAuth clients | Needs a durable AWS design; ElastiCache speaks TCP, not REST |
 | **AI features** | Claude Haiku 4.5 through the Anthropic API | Evaluating Amazon Bedrock |
-| **AWS** | Account set up; **no production workloads** | Migration planned, not started |
+| **AWS** | Account set up; **no production workloads**. Active relationship with AWS Startups BD (from TOKEN2049 Singapore, Oct 2026). | Migration planned, not started. Activate credits discussion active; see [TOKEN2049 engagement log](aws/TOKEN2049-AWS-ENGAGEMENT-LOG.md). |
 | **Card issuing** | **Designed, switched off.** No card issuer is contracted | Issuer selection pending |
 | **Banking, on-ramp and off-ramp** | Switched off; no provider contracted | Partner selection pending |
 | **iOS app** | Blocked on an Apple Developer account | [iOS runbook](deploy/IOS-RELEASE.md) |
@@ -184,6 +184,8 @@ Everything in this section is a **blueprint**: planned, not deployed.
   A plan to fund the planned infrastructure with AWS Activate credits and Solana Foundation grants; those credits and grants have **not** been secured. Contains official Agave v2.2 validator arguments, Linux sysctl tuning (`21-agave-validator.conf`), dual NVMe RAID-0 storage scripts, tmpfs AccountsDB setup, Yellowstone Dragon's Mouth gRPC configuration, and automated slot health monitoring.
 * [AWS Enterprise Security, Compliance & Infrastructure Blueprint (2026–2027)](aws/FURLPAY_AWS_ENTERPRISE_SECURITY_AND_COMPLIANCE_BLUEPRINT.md)  
   Advanced defense-in-depth architecture covering AWS Organizations multi-account governance, KMS envelope encryption with Nitro Enclave PCR attestation, production Terraform IaC modules (VPC, ECS Fargate, WAF v2), a control mapping towards PCI DSS v4.0 and SOC 2 Type II (FurlPay holds neither certification), multi-region disaster recovery runbooks, and SRE alerting matrices.
+* [TOKEN2049 AWS Engagement Log](aws/TOKEN2049-AWS-ENGAGEMENT-LOG.md)  
+  Timeline of the AWS Startups relationship established at TOKEN2049 Singapore (October 2026), Activate credits discussion status, RedotPay comparable analysis, and call-preparation notes.
 
 ---
 
