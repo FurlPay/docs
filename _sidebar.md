@@ -14,6 +14,7 @@
 
 * **Data Partners**
   * [Allium API & MCP Server](docs/research/allium-api-mcp-report.md)
+  * [Onchain Dashboard × Allium Integration](docs/research/onchain-dashboard-allium-integration.md)
 
 * **Cards**
   * [Virtual Card JIT Rails Plan](docs/VIRTUAL-CARD-JIT-RAILS-PLAN.md)
