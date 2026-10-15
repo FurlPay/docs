@@ -12,6 +12,9 @@
   * [Enterprise Security & Compliance](aws/FURLPAY_AWS_ENTERPRISE_SECURITY_AND_COMPLIANCE_BLUEPRINT.md)
   * [TOKEN2049 AWS Engagement Log](aws/TOKEN2049-AWS-ENGAGEMENT-LOG.md)
 
+* **Data Partners**
+  * [Allium API & MCP Server](docs/research/allium-api-mcp-report.md)
+
 * **Cards**
   * [Virtual Card JIT Rails Plan](docs/VIRTUAL-CARD-JIT-RAILS-PLAN.md)
 
