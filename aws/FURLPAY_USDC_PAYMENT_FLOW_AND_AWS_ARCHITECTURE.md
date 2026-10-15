@@ -1,4 +1,6 @@
 # FurlPay: Cross-Platform USDC Payment Engine & AWS Infrastructure Architecture (2026–2027)
+
+> **Status, 15 October 2026: blueprint, not deployed.** This document describes FurlPay's planned AWS architecture. Production runs on Vercel, Supabase Postgres and Upstash Redis today, and no AWS workloads are live. Card issuing is designed but switched off, and no card issuer is contracted. Latency, throughput, cost and savings figures here are design targets or models, not measurements. External claims are governed by the [verified-claims register](../docs/VERIFIED-CLAIMS.md).
 ### End-to-End Payment Flow Across Android Native, Wear OS, iOS, and Enterprise AWS Dedicated Rails
 
 **Published:** September 18, 2026  

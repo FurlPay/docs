@@ -1,4 +1,6 @@
 # FurlPay: AWS Infrastructure Cost Optimization & FinOps Reduction Report (2026–2027)
+
+> **Status, 15 October 2026: blueprint, not deployed.** This document describes FurlPay's planned AWS architecture. Production runs on Vercel, Supabase Postgres and Upstash Redis today, and no AWS workloads are live. Card issuing is designed but switched off, and no card issuer is contracted. Latency, throughput, cost and savings figures here are design targets or models, not measurements. External claims are governed by the [verified-claims register](../docs/VERIFIED-CLAIMS.md). The costs below model the planned deployment; FurlPay has not incurred this AWS spend.
 ### Engineering a 50%–73% Cost Reduction for Dedicated Solana RPC, Next.js 15, and Card/Stablecoin Infrastructure
 
 **Published:** September 18, 2026  

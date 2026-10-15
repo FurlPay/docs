@@ -1,4 +1,6 @@
 # FurlPay: AWS Enterprise Security, Compliance & Infrastructure Blueprint (2026–2027)
+
+> **Status, 15 October 2026: blueprint, not deployed.** This document describes FurlPay's planned AWS architecture. Production runs on Vercel, Supabase Postgres and Upstash Redis today, and no AWS workloads are live. Card issuing is designed but switched off, and no card issuer is contracted. Latency, throughput, cost and savings figures here are design targets or models, not measurements. External claims are governed by the [verified-claims register](../docs/VERIFIED-CLAIMS.md). FurlPay holds no PCI DSS or SOC 2 certification; the controls below are a mapping towards them.
 ### Advanced Defense-in-Depth, Zero-Trust IAM, PCI-DSS / SOC 2 Compliance, Terraform IaC, and Disaster Recovery Architecture
 
 **Published:** September 18, 2026  

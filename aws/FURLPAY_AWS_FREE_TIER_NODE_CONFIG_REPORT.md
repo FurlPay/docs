@@ -1,4 +1,6 @@
 # FurlPay: Zero-Cash AWS Blueprint & Production Solana Node Specification (2026–2027)
+
+> **Status, 15 October 2026: blueprint, not deployed.** This document describes FurlPay's planned AWS architecture. Production runs on Vercel, Supabase Postgres and Upstash Redis today, and no AWS workloads are live. Card issuing is designed but switched off, and no card issuer is contracted. Latency, throughput, cost and savings figures here are design targets or models, not measurements. External claims are governed by the [verified-claims register](../docs/VERIFIED-CLAIMS.md). The credits and grants this plan assumes have not been secured. AWS Activate grants above $1,000 require affiliation with an Activate Provider.
 ### Running 100% Free on AWS via Capital Stacking + Complete Agave v2.x Node Configuration
 
 **Published:** September 18, 2026  

@@ -1,7 +1,8 @@
 # Web deployment: Vercel → AWS
 
 > Surface: `apps/web` — Next.js 15.5 (App Router), React 18.3.
-> **314 API routes, 219 pages.** This is the backend as well as the website;
+> **314 API routes, 219 pages** when this runbook was written (September 2026);
+> **446 route handlers and 269 pages** on 15 October 2026. This is the backend as well as the website;
 > the mobile apps call it.
 
 ---
