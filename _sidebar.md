@@ -44,6 +44,7 @@
   * [Verified Claims](docs/VERIFIED-CLAIMS.md)
 
 * **Strategy & Reports**
+  * [RedotPay Strategy & AWS Case Study](reports/redotpay_strategy_and_aws_case_study.md)
   * [Singapore Expansion Blueprint](reports/furlpay_singapore_expansion_master_blueprint.md)
   * [USDC Travel Market](reports/furlpay_singapore_usdc_travel_market_report.md)
   * [Travel Architecture & Security](reports/furlpay_usdc_travel_architecture_and_security_blueprint.md)

@@ -238,6 +238,8 @@ These are **internal** reviews. FurlPay has not had a third-party security audit
 
 ### 6. Expansion Blueprints & Strategy (reports/)
 
+* [RedotPay Strategy & AWS Case Study](reports/redotpay_strategy_and_aws_case_study.md)  
+  Full deep-dive on RedotPay — the closest AWS Web3 payments case study to FurlPay. Covers their $194M funding, $2B valuation, 6M+ users, AWS architecture (ALB → EKS → Aurora), Visa card GTM strategy, regulatory licenses, competitive landscape, and lessons for FurlPay's AWS partnership pitch.
 * [Singapore Expansion Master Blueprint](reports/furlpay_singapore_expansion_master_blueprint.md)  
   MAS Major Payment Institution (MPI) compliance roadmap, SGQR / PayNow integration, and Southeast Asian cross-border settlement.
 * [USDC Travel Market & Tourism Rails](reports/furlpay_singapore_usdc_travel_market_report.md)  
