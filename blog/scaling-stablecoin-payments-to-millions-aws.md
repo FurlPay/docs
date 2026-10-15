@@ -1,4 +1,4 @@
-# Scaling Stablecoin Payments to Millions: Why We Migrated FurlPay from Shared RPCs to Dedicated AWS Infrastructure
+# Scaling Stablecoin Payments to Millions: Why FurlPay Is Moving from Shared RPCs to Dedicated AWS Infrastructure
 
 **By FurlPay Architecture Team**  
 *7 min read · Published September 2026*
@@ -198,3 +198,5 @@ We have made our complete infrastructure specifications, FinOps calculations, an
 * **Cross-Platform Payment Flow & AWS Architecture:** [`aws/FURLPAY_USDC_PAYMENT_FLOW_AND_AWS_ARCHITECTURE.md`](https://github.com/FurlPay/docs/blob/main/aws/FURLPAY_USDC_PAYMENT_FLOW_AND_AWS_ARCHITECTURE.md)
 * **1-Year Master AWS Migration Blueprint:** [`aws/FURLPAY_1_YEAR_AWS_INFRASTRUCTURE_REPORT.md`](https://github.com/FurlPay/docs/blob/main/aws/FURLPAY_1_YEAR_AWS_INFRASTRUCTURE_REPORT.md)
 * **AWS Enterprise Security & Compliance Blueprint:** [`aws/FURLPAY_AWS_ENTERPRISE_SECURITY_AND_COMPLIANCE_BLUEPRINT.md`](https://github.com/FurlPay/docs/blob/main/aws/FURLPAY_AWS_ENTERPRISE_SECURITY_AND_COMPLIANCE_BLUEPRINT.md)
+
+> **Status, 15 October 2026: blueprint, not deployed.** This document describes FurlPay's planned AWS architecture. Production runs on Vercel, Supabase Postgres and Upstash Redis today, and no AWS workloads are live. Card issuing is designed but switched off, and no card issuer is contracted. Latency, throughput, cost and savings figures here are design targets or models, not measurements. External claims are governed by the [verified-claims register](../docs/VERIFIED-CLAIMS.md). This post was first published describing the migration as complete. It has not started; the post describes the target architecture.

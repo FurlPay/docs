@@ -3,12 +3,16 @@
 * **Engineering Blog**
   * [Scaling Stablecoin Payments (AWS)](blog/scaling-stablecoin-payments-to-millions-aws.md)
 
-* **AWS Infrastructure**
+* **AWS Infrastructure (blueprints)**
+  * [AWS Engagement Brief](aws/AWS-ENGAGEMENT-BRIEF.md)
   * [USDC Payment Flow & AWS](aws/FURLPAY_USDC_PAYMENT_FLOW_AND_AWS_ARCHITECTURE.md)
   * [1-Year AWS Migration Blueprint](aws/FURLPAY_1_YEAR_AWS_INFRASTRUCTURE_REPORT.md)
-  * [AWS FinOps Cost Optimization](aws/FURLPAY_AWS_COST_OPTIMIZATION_REPORT.md)
-  * [Zero-Cash & Production Solana Node](aws/FURLPAY_AWS_FREE_TIER_NODE_CONFIG_REPORT.md)
+  * [AWS Cost Model](aws/FURLPAY_AWS_COST_OPTIMIZATION_REPORT.md)
+  * [Credits Plan & Solana Node Spec](aws/FURLPAY_AWS_FREE_TIER_NODE_CONFIG_REPORT.md)
   * [Enterprise Security & Compliance](aws/FURLPAY_AWS_ENTERPRISE_SECURITY_AND_COMPLIANCE_BLUEPRINT.md)
+
+* **Cards**
+  * [Virtual Card JIT Rails Plan](docs/VIRTUAL-CARD-JIT-RAILS-PLAN.md)
 
 * **Deployment & Environments**
   * [Environments (dev / staging / prod)](deploy/ENVIRONMENTS.md)
@@ -20,7 +24,7 @@
   * [Play Store Signing](docs/PLAY-SIGNING-RUNBOOK.md)
 
 * **Security & Audits**
-  * [Master Monorepo Audit](audit/FULL_CODEBASE_AUDIT_REPORT.md)
+  * [Monorepo Review (internal)](audit/FULL_CODEBASE_AUDIT_REPORT.md)
   * [Mobile Security Audit](docs/MOBILE_SECURITY_AUDIT.md)
   * [Transaction Security](docs/TRANSACTION_SECURITY.md)
   * [x402 Attack Vectors](docs/security/x402-attacks.md)
