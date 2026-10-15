@@ -1,4 +1,4 @@
-# RedotPay — Full Strategy & AWS Case Study Report
+# Competitor A — Full Strategy & AWS Case Study Report
 
 **Prepared for:** Ashutosh Kumar Singh, Founder & CEO, FurlPay  
 **Purpose:** Reference case study for AWS partnership discussions with Cyrus Fang  
@@ -25,23 +25,23 @@
 
 | Detail | Information |
 |---|---|
-| **Company** | RedotPay |
+| **Company** | Competitor A |
 | **Legal Entity** | Red F. Technology Limited |
 | **Founded** | April 2023 |
 | **HQ** | Hong Kong |
 | **Industry** | Crypto-fintech / Stablecoin Payments |
 | **Users** | 6+ million verified users |
 | **Countries** | 100+ countries |
-| **Website** | [redotpay.com](https://redotpay.com) |
+| **Website** | [Competitor A.com](https://Competitor A.com) |
 | **Valuation** | ~$2 billion (Dec 2025); exploring $4B IPO |
 | **Total Raised** | $194 million |
 
-### What RedotPay Does
+### What Competitor A Does
 
-RedotPay bridges **decentralized digital assets (stablecoins) with traditional financial rails**. In simple terms: users load USDT/USDC into their RedotPay wallet, get a Visa card, and spend crypto anywhere Visa is accepted — at 130M+ merchants globally. The conversion from crypto to fiat happens **in real-time at the point of sale**.
+Competitor A bridges **decentralized digital assets (stablecoins) with traditional financial rails**. In simple terms: users load USDT/USDC into their Competitor A wallet, get a Visa card, and spend crypto anywhere Visa is accepted — at 130M+ merchants globally. The conversion from crypto to fiat happens **in real-time at the point of sale**.
 
 > [!IMPORTANT]
-> RedotPay is the **closest operational parallel to FurlPay** in the AWS ecosystem. Both companies sit at the intersection of crypto payments, stablecoin infrastructure, and traditional finance rails. This is the case study to reference when speaking with Cyrus Fang.
+> Competitor A is the **closest operational parallel to FurlPay** in the AWS ecosystem. Both companies sit at the intersection of crypto payments, stablecoin infrastructure, and traditional finance rails. This is the case study to reference when speaking with Cyrus Fang.
 
 ---
 
@@ -53,7 +53,7 @@ RedotPay bridges **decentralized digital assets (stablecoins) with traditional f
 | **Jonathan Chan** | Co-Founder & Head of Partnerships | Institutional relationships, payment corridors, ecosystem expansion |
 
 ### Key Insight
-Michael Gao's **traditional banking background** (DBS is one of Southeast Asia's largest banks) gave RedotPay instant credibility with card networks, regulators, and institutional investors. The TradFi-to-crypto founder archetype is powerful for compliance-first companies.
+Michael Gao's **traditional banking background** (DBS is one of Southeast Asia's largest banks) gave Competitor A instant credibility with card networks, regulators, and institutional investors. The TradFi-to-crypto founder archetype is powerful for compliance-first companies.
 
 ---
 
@@ -95,7 +95,7 @@ flowchart LR
 | Vertex Ventures (Temasek-backed) | Southeast Asia VC | Strategic |
 
 > [!TIP]
-> **For the AWS call:** RedotPay's investor roster includes major AWS ecosystem players — Coinbase, Circle, and Lightspeed all have deep AWS relationships. Mentioning that FurlPay is building similar infrastructure should resonate.
+> **For the AWS call:** Competitor A's investor roster includes major AWS ecosystem players — Coinbase, Circle, and Lightspeed all have deep AWS relationships. Mentioning that FurlPay is building similar infrastructure should resonate.
 
 ---
 
@@ -105,7 +105,7 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-    A["RedotPay Platform"] --> B["💳 Crypto Visa Card"]
+    A["Competitor A Platform"] --> B["💳 Crypto Visa Card"]
     A --> C["👛 Multi-Currency Wallet"]
     A --> D["🔄 Crypto Swap"]
     A --> E["📈 Earn Program"]
@@ -142,7 +142,7 @@ flowchart TD
 
 ## 5. Go-to-Market Strategy
 
-### The RedotPay GTM Formula
+### The Competitor A GTM Formula
 
 > **Treat stablecoins as the settlement layer. Leverage Visa's 130M+ merchant network as the frontend. Target emerging markets where traditional banking fails.**
 
@@ -153,7 +153,7 @@ flowchart TD
 ```mermaid
 flowchart LR
     A["Local Currency<br/>Inflation"] --> B["Users Convert to<br/>USDT/USDC<br/>(Digital Dollars)"]
-    B --> C["RedotPay Wallet"]
+    B --> C["Competitor A Wallet"]
     C --> D["Visa Card Spend<br/>Globally"]
     C --> E["P2P Transfers"]
     C --> F["Cross-Border<br/>Remittances"]
@@ -162,7 +162,7 @@ flowchart LR
 - **Target Markets:** Latin America, Africa, Middle East, Southeast Asia
 - **Problem Solved:** High local inflation, weak banking infrastructure, limited USD access
 - **Solution:** Stablecoins as digital dollars + Visa card for real-world spending
-- Users in Argentina, Nigeria, and similar markets use RedotPay as their primary financial tool
+- Users in Argentina, Nigeria, and similar markets use Competitor A as their primary financial tool
 
 #### Pillar 2: Zero-Friction Onboarding
 - Fast KYC powered by AWS auto-scaling infrastructure
@@ -186,9 +186,9 @@ flowchart LR
 
 ## 6. AWS Infrastructure Deep Dive
 
-### Why RedotPay Chose AWS
+### Why Competitor A Chose AWS
 
-RedotPay deployed its **entire infrastructure on AWS in just one week** at launch (April 2023). Three driving reasons:
+Competitor A deployed its **entire infrastructure on AWS in just one week** at launch (April 2023). Three driving reasons:
 
 1. **Data Security & Global Compliance** — Financial workloads require SOC/ISO/GDPR-ready infrastructure
 2. **Global Scalability** — Multi-region deployment for low-latency international card settlements
@@ -249,7 +249,7 @@ flowchart TD
     D3 --> G1
 ```
 
-### AWS Services Used by RedotPay
+### AWS Services Used by Competitor A
 
 | AWS Service | Use Case |
 |---|---|
@@ -274,7 +274,7 @@ flowchart TD
 | **Architecture** | Microservices-based |
 
 > [!NOTE]
-> **Key Takeaway for FurlPay:** RedotPay deployed on AWS in **1 week** and was processing real payments shortly after. This speed-to-market story resonates with AWS — it demonstrates the platform's startup-friendliness. FurlPay can tell a similar story.
+> **Key Takeaway for FurlPay:** Competitor A deployed on AWS in **1 week** and was processing real payments shortly after. This speed-to-market story resonates with AWS — it demonstrates the platform's startup-friendliness. FurlPay can tell a similar story.
 
 ---
 
@@ -309,9 +309,9 @@ flowchart TD
 
 ## 8. Competitive Landscape
 
-### RedotPay vs. Major Competitors
+### Competitor A vs. Major Competitors
 
-| Feature | RedotPay | Binance Card | Crypto.com Card |
+| Feature | Competitor A | Binance Card | Crypto.com Card |
 |---|---|---|---|
 | **Primary Focus** | Low-cost stablecoin spending | Exchange ecosystem utility | Tiered lifestyle perks |
 | **Target Market** | Emerging markets, unbanked | Crypto traders | Crypto-native consumers |
@@ -326,7 +326,7 @@ flowchart TD
 | **KYC Speed** | Fast / streamlined | Slow / extensive | Slow / extensive |
 | **Regulatory Licenses** | 5+ jurisdictions | Complex / jurisdiction-dependent | Multiple licenses |
 
-### RedotPay's Competitive Advantages
+### Competitor A's Competitive Advantages
 
 1. **Near-zero stablecoin spending fees** — no conversion penalty for USDT/USDC
 2. **Speed of onboarding** — virtual card in minutes vs. days on exchanges
@@ -370,9 +370,9 @@ flowchart LR
 
 ## 10. Lessons & Parallels for FurlPay
 
-### What FurlPay Can Learn from RedotPay
+### What FurlPay Can Learn from Competitor A
 
-| RedotPay Strategy | FurlPay Parallel | Action Item |
+| Competitor A Strategy | FurlPay Parallel | Action Item |
 |---|---|---|
 | Built on AWS from Day 1 | ✅ Already on Vercel/cloud | Articulate AWS migration/expansion plan to Cyrus |
 | Compliance-first approach | ✅ Building with security rules | Highlight Zod validation, rate limiting, HMAC verification in pitch |
@@ -386,13 +386,13 @@ flowchart LR
 ### Talking Points for the Cyrus Call
 
 > [!IMPORTANT]
-> **The RedotPay Pitch to Cyrus:**
+> **The Competitor A Pitch to Cyrus:**
 > 
-> *"RedotPay is one of AWS's biggest Web3 success stories — they deployed on AWS in one week, scaled to 6M users, and are now a $2B company heading for IPO. FurlPay is building at the same intersection — stablecoin payments, card issuing, and AI-powered finance — but with a unique travel vertical. We want to be the next RedotPay-scale story for AWS."*
+> *"Competitor A is one of AWS's biggest Web3 success stories — they deployed on AWS in one week, scaled to 6M users, and are now a $2B company heading for IPO. FurlPay is building at the same intersection — stablecoin payments, card issuing, and AI-powered finance — but with a unique travel vertical. We want to be the next Competitor A-scale story for AWS."*
 
-### FurlPay's Unique Differentiators vs. RedotPay
+### FurlPay's Unique Differentiators vs. Competitor A
 
-| Differentiator | FurlPay | RedotPay |
+| Differentiator | FurlPay | Competitor A |
 |---|---|---|
 | **Travel Integration** | ✅ Flights + Hotels + Crypto Payments | ❌ No travel vertical |
 | **AI-Powered Intelligence** | ✅ Core product feature | 🟡 Exploring (SageMaker) |
@@ -401,7 +401,7 @@ flowchart LR
 
 ### AWS Services FurlPay Should Request Credits For
 
-Based on RedotPay's architecture, these are the AWS services FurlPay should target:
+Based on Competitor A's architecture, these are the AWS services FurlPay should target:
 
 | Service | FurlPay Use Case | Monthly Est. |
 |---|---|---|
@@ -421,11 +421,11 @@ Based on RedotPay's architecture, these are the AWS services FurlPay should targ
 
 | Source | URL |
 |---|---|
-| AWS Case Study | [aws.amazon.com/solutions/case-studies/redotpay](https://aws.amazon.com/solutions/case-studies/redotpay) |
-| RedotPay Official | [redotpay.com](https://redotpay.com) |
-| Series B Announcement | [redotpay.com/blog](https://redotpay.com) |
+| AWS Case Study | [aws.amazon.com/solutions/case-studies/Competitor A](https://aws.amazon.com/solutions/case-studies/Competitor A) |
+| Competitor A Official | [Competitor A.com](https://Competitor A.com) |
+| Series B Announcement | [Competitor A.com/blog](https://Competitor A.com) |
 | LexisNexis Partnership | [lexisnexis.com](https://risk.lexisnexis.com) |
 
 ---
 
-*Report compiled on October 15, 2026. All data sourced from AWS case studies, RedotPay official announcements, investor press releases, and public financial reporting.*
+*Report compiled on October 15, 2026. All data sourced from AWS case studies, Competitor A official announcements, investor press releases, and public financial reporting.*

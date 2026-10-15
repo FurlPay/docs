@@ -76,12 +76,12 @@ context from the TOKEN2049 discussions.
 
 ---
 
-## 5. Comparable: RedotPay on AWS
+## 5. Comparable: Leading Crypto-Card Platform on AWS
 
-RedotPay is the closest operational parallel in the AWS ecosystem. Both
+A leading crypto-card platform is the closest operational parallel in the AWS ecosystem. Both
 companies build stablecoin payment infrastructure with card issuing.
 
-| Metric | RedotPay | FurlPay (current) |
+| Metric | Competitor | FurlPay (current) |
 | :--- | :--- | :--- |
 | Founded | April 2023 | 2024 |
 | Users | 6M+ verified | Early stage |
@@ -92,8 +92,8 @@ companies build stablecoin payment infrastructure with card issuing.
 | AI features | Exploring SageMaker | Claude Haiku 4.5 via Anthropic API |
 | Travel vertical | None | Core product (flights, hotels, crypto payments) |
 
-RedotPay deployed on AWS in one week and now processes $10B+ in annualized
-payment volume. AWS published RedotPay as an official case study. FurlPay's
+This competitor deployed on AWS in one week and now processes $10B+ in annualized
+payment volume. AWS published it as an official case study. FurlPay's
 differentiators are its travel vertical, AI-native architecture, and agentic
 finance capabilities.
 

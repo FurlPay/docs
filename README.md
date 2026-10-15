@@ -185,7 +185,7 @@ Everything in this section is a **blueprint**: planned, not deployed.
 * [AWS Enterprise Security, Compliance & Infrastructure Blueprint (2026–2027)](aws/FURLPAY_AWS_ENTERPRISE_SECURITY_AND_COMPLIANCE_BLUEPRINT.md)  
   Advanced defense-in-depth architecture covering AWS Organizations multi-account governance, KMS envelope encryption with Nitro Enclave PCR attestation, production Terraform IaC modules (VPC, ECS Fargate, WAF v2), a control mapping towards PCI DSS v4.0 and SOC 2 Type II (FurlPay holds neither certification), multi-region disaster recovery runbooks, and SRE alerting matrices.
 * [TOKEN2049 AWS Engagement Log](aws/TOKEN2049-AWS-ENGAGEMENT-LOG.md)  
-  Timeline of the AWS Startups relationship established at TOKEN2049 Singapore (October 2026), Activate credits discussion status, RedotPay comparable analysis, and call-preparation notes.
+  Timeline of the AWS Startups relationship established at TOKEN2049 Singapore (October 2026), Activate credits discussion status, competitor comparable analysis, and call-preparation notes.
 
 ---
 
@@ -238,8 +238,8 @@ These are **internal** reviews. FurlPay has not had a third-party security audit
 
 ### 6. Expansion Blueprints & Strategy (reports/)
 
-* [RedotPay Strategy & AWS Case Study](reports/redotpay_strategy_and_aws_case_study.md)  
-  Full deep-dive on RedotPay — the closest AWS Web3 payments case study to FurlPay. Covers their $194M funding, $2B valuation, 6M+ users, AWS architecture (ALB → EKS → Aurora), Visa card GTM strategy, regulatory licenses, competitive landscape, and lessons for FurlPay's AWS partnership pitch.
+* [Competitor AWS Case Study & Benchmarks](reports/competitor_aws_case_study.md)  
+  Deep-dive on the closest AWS Web3 payments case study to FurlPay. Covers $194M funding, $2B valuation, 6M+ users, AWS architecture (ALB → EKS → Aurora), Visa card GTM strategy, regulatory licenses, competitive landscape, and lessons for FurlPay's AWS partnership pitch.
 * [Singapore Expansion Master Blueprint](reports/furlpay_singapore_expansion_master_blueprint.md)  
   MAS Major Payment Institution (MPI) compliance roadmap, SGQR / PayNow integration, and Southeast Asian cross-border settlement.
 * [USDC Travel Market & Tourism Rails](reports/furlpay_singapore_usdc_travel_market_report.md)  
@@ -247,7 +247,7 @@ These are **internal** reviews. FurlPay has not had a third-party security audit
 * [USDC Travel Architecture & Security Blueprint](reports/furlpay_usdc_travel_architecture_and_security_blueprint.md)  
   Offline travel vouchers, MCC-locked virtual cards, and airline ticketing integration.
 * [Algorithmic Settlement & Competitive Disruption](reports/furlpay_algorithmic_settlement_competitive_report.md)  
-  Comparative analysis against Stripe, RedotPay, and traditional acquiring networks.
+  Comparative analysis against Stripe, leading crypto-card platforms, and traditional acquiring networks.
 * [Partner Onboarding Master Report](reports/furlpay_partner_onboarding_master_report.md)  
   Technical guidelines for payment service providers (PSPs), independent sales organizations (ISOs), and payment gateways.
 

@@ -2,7 +2,7 @@
 
 **Date:** 4 September 2026
 **Status:** proposed — no code changed yet
-**Companion:** [`tangem-redotpay-furlpay-forensic-audit.md`](./tangem-redotpay-furlpay-forensic-audit.md)
+**Companion:** [`tangem-competitor-furlpay-forensic-audit.md`](./tangem-competitor-furlpay-forensic-audit.md)
 
 The canonical representation of money and of asset identity in FurlPay, and the audit that motivated it.
 

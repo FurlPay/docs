@@ -1,7 +1,7 @@
-# Competitive teardown — RedotPay, Tangem, FurlPay
+# Competitive teardown — Competitor A, Tangem, FurlPay
 
 **Date:** 6 September 2026
-**Method:** RedotPay from decompiled APK (jadx + apktool + Dart AOT string extraction from `libapp.so`). Tangem from its **public source repositories** (`reference/tangem-app-android`, `reference/tangem-app-ios`) cross-checked against the shipped APK. FurlPay from this repository.
+**Method:** Competitor A from decompiled APK (jadx + apktool + Dart AOT string extraction from `libapp.so`). Tangem from its **public source repositories** (`reference/tangem-app-android`, `reference/tangem-app-ios`) cross-checked against the shipped APK. FurlPay from this repository.
 
 **Benchmarking only.** Nothing here is a licence to copy an implementation. The value is in the *shape* of what they built and what that implies we are missing.
 
@@ -32,7 +32,7 @@ In an earlier session I told you, based on the **shipped Tangem APK**:
 
 ## Scale
 
-| | RedotPay | Tangem | FurlPay |
+| | Competitor A | Tangem | FurlPay |
 |---|---:|---:|---:|
 | Architecture | Flutter (Dart AOT), NetEase-packed | Kotlin (Android) + Swift (iOS), modular | Next.js + Expo RN |
 | API endpoints | **619** | server-driven (Express aggregator) | **302** |
@@ -41,7 +41,7 @@ In an earlier session I told you, based on the **shipped Tangem APK**:
 | Native libs | 30 `.so` (incl. 31 MB `libapp.so`) | TangemSdk + blockchain libs | none |
 | **iOS app** | ✅ shipping | ✅ shipping (full parity) | ❌ **no build config** |
 
-RedotPay's 619 endpoints break down as: `user` 368 (card 59, security 51, asset 43, vba 36, creditV2 21, earn 18, loan 15, membership 14), `otc` 64, `send` 29, `remittance` 26.
+Competitor A's 619 endpoints break down as: `user` 368 (card 59, security 51, asset 43, vba 36, creditV2 21, earn 18, loan 15, membership 14), `otc` 64, `send` 29, `remittance` 26.
 
 ---
 
@@ -51,7 +51,7 @@ Legend: ✅ shipping · ◐ partial · ⬜ absent · **n/a** not in that product
 
 ### Identity & security
 
-| Capability | RedotPay | Tangem | FurlPay | Gap |
+| Capability | Competitor A | Tangem | FurlPay | Gap |
 |---|:--:|:--:|:--:|---|
 | Passkey / WebAuthn | ✅ 9 endpoints | ✅ | ✅ | — |
 | Hardware-key auth (bind/challenge/verify) | ✅ 4 endpoints | ✅ NFC card | ◐ interface only | **Signer registry exists; no NFC/BLE implementation** |
@@ -68,7 +68,7 @@ Legend: ✅ shipping · ◐ partial · ⬜ absent · **n/a** not in that product
 
 ### Cards
 
-| Capability | RedotPay | Tangem | FurlPay | Gap |
+| Capability | Competitor A | Tangem | FurlPay | Gap |
 |---|:--:|:--:|:--:|---|
 | Card issuance | ✅ | ✅ Visa activation SM | ⬜ gated | **Issuer-blocked** |
 | Card activation state machine | ✅ | ✅ 8-state | ⬜ | **Code gap** — copyable pattern |
@@ -86,7 +86,7 @@ Legend: ✅ shipping · ◐ partial · ⬜ absent · **n/a** not in that product
 
 ### Money movement
 
-| Capability | RedotPay | Tangem | FurlPay | Gap |
+| Capability | Competitor A | Tangem | FurlPay | Gap |
 |---|:--:|:--:|:--:|---|
 | On-ramp | ✅ Paybis/dLocal/Mesh | ✅ Express aggregator | ◐ CDP + demo | **Provider-blocked** |
 | Off-ramp | ✅ | ✅ | ◐ quote only | **Provider-blocked** |
@@ -102,7 +102,7 @@ Legend: ✅ shipping · ◐ partial · ⬜ absent · **n/a** not in that product
 
 ### Financial products
 
-| Capability | RedotPay | Tangem | FurlPay | Gap |
+| Capability | Competitor A | Tangem | FurlPay | Gap |
 |---|:--:|:--:|:--:|---|
 | Earn / yield | ✅ 18 endpoints | ✅ `yield-supply` 57 files | ◐ Morpho gated | Partial |
 | Staking | ⬜ | ✅ 86 files | ⬜ | Missing |
@@ -116,7 +116,7 @@ Legend: ✅ shipping · ◐ partial · ⬜ absent · **n/a** not in that product
 
 ### Platform
 
-| Capability | RedotPay | Tangem | FurlPay | Gap |
+| Capability | Competitor A | Tangem | FurlPay | Gap |
 |---|:--:|:--:|:--:|---|
 | **iOS app** | ✅ | ✅ | ❌ | **No `native-app/ios`, no iOS EAS profile** |
 | Android app | ✅ | ✅ | ◐ unpublished | Play upload pending |
@@ -141,13 +141,13 @@ Legend: ✅ shipping · ◐ partial · ⬜ absent · **n/a** not in that product
 | A1 | **iOS build configuration** | `native-app/ios` does not exist; `eas.json` has android-only profiles. `furlpay-ios/` is a 28-file Solana Pay demo, not the app | L |
 | A2 | **Transaction simulation before signing** | Tangem uses Blockaid; our own audit flagged `/api/mpc/sign` accepts an opaque digest | M |
 | A3 | **Card activation state machine** | Tangem's 8-state model is a clean pattern; ours has no state machine at all | M |
-| A4 | **Anti-phishing code** | RedotPay `saveAntiPhishingCode`/`getAntiPhishingCode`. Cheap, high-value anti-social-engineering control | S |
-| A5 | **P2P durability** | Ours is `globalThis`; RedotPay has 64 endpoints and escrow | M |
+| A4 | **Anti-phishing code** | Competitor A `saveAntiPhishingCode`/`getAntiPhishingCode`. Cheap, high-value anti-social-engineering control | S |
+| A5 | **P2P durability** | Ours is `globalThis`; Competitor A has 64 endpoints and escrow | M |
 | A6 | **Statement / bill export** | Both competitors have it; regulators expect it | S |
-| A7 | **EDD questionnaire flow** | RedotPay `vba/cra/*` + 9 `edd` views. Required by FIU-IND guidelines | M |
+| A7 | **EDD questionnaire flow** | Competitor A `vba/cra/*` + 9 `edd` views. Required by FIU-IND guidelines | M |
 | A8 | **Hardware-wallet signer implementation** | Our `SignerPicker` advertises NFC/BLE; no implementation behind it | L |
 | A9 | **App attestation / anti-tamper** | Both competitors ship it; we have `deviceIntegrity.ts` only | M |
-| A10 | **Deposit recall / reversal UI** | RedotPay models it explicitly; our lifecycle has the states, no surface | S |
+| A10 | **Deposit recall / reversal UI** | Competitor A models it explicitly; our lifecycle has the states, no surface | S |
 
 ### B. Partner-blocked — code can be built, cannot be switched on
 
@@ -171,9 +171,9 @@ Staking, NFT, prediction markets. Tangem has all three; none is on the path to a
 
 **1. Tangem's modular boundary is better than ours.** 46 feature modules and 52 domain modules with `api` / `impl` / `mock` splits per feature. `features/kyc/mock` exists as a first-class module — the mock is a *build target*, not a runtime branch. Our `INTEGRATION_MODE=live` is a global runtime flag; theirs is a compile-time swap. Theirs cannot leak a mock into production.
 
-**2. RedotPay's façade pattern is the one we already chose.** Every provider (Paybis, dLocal, Mesh, Binance Pay, Bybit) sits behind RedotPay's own `/api/v1/payin/onramp/*` and `/api/v1/onramp/*`. Their own order ids, their own state. That is exactly `lib/providers/types.ts`. Confirmation we picked right.
+**2. Competitor A's façade pattern is the one we already chose.** Every provider (Paybis, dLocal, Mesh, Binance Pay, Bybit) sits behind Competitor A's own `/api/v1/payin/onramp/*` and `/api/v1/onramp/*`. Their own order ids, their own state. That is exactly `lib/providers/types.ts`. Confirmation we picked right.
 
-**3. Both ship transaction-safety we don't have.** Tangem uses Blockaid for pre-signature simulation and dApp checks. RedotPay ships ThreatMetrix plus an anti-tamper packer. Our Trust Layer is arguably better-designed than either at the *scoring* layer — and it has no data feeding it, and no simulation in front of the signer.
+**3. Both ship transaction-safety we don't have.** Tangem uses Blockaid for pre-signature simulation and dApp checks. Competitor A ships ThreatMetrix plus an anti-tamper packer. Our Trust Layer is arguably better-designed than either at the *scoring* layer — and it has no data feeding it, and no simulation in front of the signer.
 
 ---
 
@@ -181,7 +181,7 @@ Staking, NFT, prediction markets. Tangem has all three; none is on the path to a
 
 Not many places, and worth being precise:
 
-- **Agentic payments.** x402 / EIP-3009 with a real settler, confirmation-depth gating, replacement handling. RedotPay has `me/authorizations/*` and `mpp_charges` — the same idea — but ours is the more complete protocol implementation.
+- **Agentic payments.** x402 / EIP-3009 with a real settler, confirmation-depth gating, replacement handling. Competitor A has `me/authorizations/*` and `mpp_charges` — the same idea — but ours is the more complete protocol implementation.
 - **Ledger correctness.** Neither competitor's client reveals a double-entry ledger with evidence-gated state transitions. Ours refuses to call an HTTP 200 a settlement. That is invisible to a user and decisive to an auditor.
 - **Provider independence by construction.** Capability matrix gated on signed contracts; failover that cannot double-pay.
 - **Surface breadth.** Web + extension + Wear OS + travel. Neither competitor has any of these.

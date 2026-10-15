@@ -1,4 +1,4 @@
-# Forensic audit — Tangem, RedotPay, FurlPay
+# Forensic audit — Tangem, Competitor A, FurlPay
 
 **Date:** 4 September 2026
 **Phase:** 1 — audit only. No production code changed.
@@ -14,21 +14,21 @@ The brief assumed both reference implementations were available as source. Only 
 |---|---|---|---|
 | **Tangem Android** | `reference/tangem-app-android` | Kotlin source, ~290 modules, 8,179 files | **Yes** — full source |
 | **Tangem iOS** | `reference/tangem-app-ios` | Swift source, 6,844 files | **Yes** — full source |
-| **RedotPay** | `~/Desktop/APK_Decompile/redotpay` | Decompiled APK | **No** — see below |
+| **Competitor A** | `~/Desktop/APK_Decompile/Competitor A` | Decompiled APK | **No** — see below |
 
-### Why RedotPay cannot be source-audited
+### Why Competitor A cannot be source-audited
 
 Traced, not assumed:
 
-1. `source/sources/com/redotpay/` contains **exactly one file**: `R.java`, the generated resource-ID class. No business logic.
+1. `source/sources/com/Competitor A/` contains **exactly one file**: `R.java`, the generated resource-ID class. No business logic.
 2. Total Java files in the decompile: **32**. Of those, 29 are the NetEase SDK, 1 is `R.java`, 1 is an obfuscated stub.
-3. `resources/assets/flutter_assets/` is present → **RedotPay is a Flutter application.** All business logic is Dart.
+3. `resources/assets/flutter_assets/` is present → **Competitor A is a Flutter application.** All business logic is Dart.
 4. `flutter_assets/kernel_blob.bin` is **absent** → this is a **release AOT build**. Dart is compiled to native machine code, not to any recoverable intermediate.
 5. The APK contains **no `libapp.so` and no `libflutter.so`** — it is the base APK of a split bundle; the Dart machine code is not even in this artifact.
 
-**Conclusion: there is no RedotPay business logic to read.** No account model, no ledger, no authorization-hold implementation, no settlement state machine. Any claim in this document about RedotPay's *internal* architecture would be fabrication, so none is made.
+**Conclusion: there is no Competitor A business logic to read.** No account model, no ledger, no authorization-hold implementation, no settlement state machine. Any claim in this document about Competitor A's *internal* architecture would be fabrication, so none is made.
 
-### What RedotPay evidence *does* support
+### What Competitor A evidence *does* support
 
 Observable from the manifest and bundled assets only — client-side posture, nothing about the backend:
 
@@ -41,9 +41,9 @@ Observable from the manifest and bundled assets only — client-side posture, no
 | **AppsFlyer** | `assets/com/appsflyer` | Attribution SDK |
 | **In-app AI support** | `flutter_assets/packages/gpt_markdown`, `flutter_chat_ui` | LLM-backed support surface |
 
-The single transferable inference: **RedotPay treats the device as an untrusted participant and fingerprints it**, and pushes KYC capture to the device while (necessarily) verifying server-side. That is relevant to FurlPay's device-binding question in §17 of the brief and to nothing else.
+The single transferable inference: **Competitor A treats the device as an untrusted participant and fingerprints it**, and pushes KYC capture to the device while (necessarily) verifying server-side. That is relevant to FurlPay's device-binding question in §17 of the brief and to nothing else.
 
-**A compensating substitute was found.** `reference/tangem-app-android/libs/visa/` and `domain/visa/` contain a readable card-payment integration with balances, spend limits, OTP thresholds and scheduled limit changes. This is the closest *readable* analogue to the RedotPay domain the brief wanted, and §3 below uses it in RedotPay's place.
+**A compensating substitute was found.** `reference/tangem-app-android/libs/visa/` and `domain/visa/` contain a readable card-payment integration with balances, spend limits, OTP thresholds and scheduled limit changes. This is the closest *readable* analogue to the Competitor A domain the brief wanted, and §3 below uses it in Competitor A's place.
 
 ---
 
@@ -81,7 +81,7 @@ This is the deepest idea in the codebase and the one FurlPay is furthest from ha
 
 ### "What does the card-payment lifecycle understand about authorization → reservation → settlement?"
 
-From `libs/visa/src/main/kotlin/com/tangem/lib/visa/model/VisaContractInfo.kt` — the readable substitute for RedotPay:
+From `libs/visa/src/main/kotlin/com/tangem/lib/visa/model/VisaContractInfo.kt` — the readable substitute for Competitor A:
 
 ```kotlin
 data class Balances(
@@ -128,7 +128,7 @@ Five patterns, each of which FurlPay currently collapses:
 
 `ADOPT` = take the pattern. `ADAPT` = take the principle, different mechanism. `REJECT` = deliberately not applicable.
 
-| Capability | Tangem (source-traced) | RedotPay (artifact only) | FurlPay (today) | Action |
+| Capability | Tangem (source-traced) | Competitor A (artifact only) | FurlPay (today) | Action |
 |---|---|---|---|---|
 | **Asset identity** | `CryptoCurrency.Coin`/`.Token` — network, decimals, contractAddress all on the type; validated in `init` | — | `asset: string` + separate `network: string`; `USDC_DECIMALS = 6` global | **ADOPT** — P0 |
 | **Amount representation** | On-chain `BigInteger` atomic → `BigDecimal` for display via `movePointLeft(decimals)`. Never float. | — | Mixed: atomic strings in payment-intent, `number` cents in agentPolicy, `number` minor units in ledger | **ADAPT** — P0 |
@@ -243,8 +243,8 @@ Tangem's card reports `totalSignedHashes`. FurlPay's budget store reports a runn
 
 | Pattern | Source | Why rejected |
 |---|---|---|
-| Device fingerprinting | RedotPay | FurlPay's caller is a server-side agent with a signing key. Fingerprinting a datacentre is noise. |
-| On-device KYC/liveness | RedotPay | Outside the product boundary — FurlPay does not onboard consumers. |
+| Device fingerprinting | Competitor A | FurlPay's caller is a server-side agent with a signing key. Fingerprinting a datacentre is noise. |
+| On-device KYC/liveness | Competitor A | Outside the product boundary — FurlPay does not onboard consumers. |
 | NFC / hardware element | Tangem | No hardware in FurlPay's path. The *principle* (authority isolated from the app layer) is adopted; the mechanism is not. |
 | Blind hash signing | Tangem | FurlPay's agent authorization binds method, path, query, body and amount. Signing an opaque digest would be a regression. |
 | Card issuing / Visa rails | Both | Explicit non-goal. |
@@ -306,7 +306,7 @@ Revised from the brief after inspecting the tree. Each commit builds, passes tes
 
 Stated so nothing here is over-read:
 
-- **RedotPay's backend architecture.** Not knowable from the artifact. No claim made.
+- **Competitor A's backend architecture.** Not knowable from the artifact. No claim made.
 - **Tangem's iOS implementation.** 6,844 Swift files present but not traced; Android was traced and is the basis of every Tangem claim above.
 - **Runtime behaviour of any Tangem flow.** Nothing was built or executed; all Tangem findings are static reads of source.
 - **Whether the P0 asset-identity defect is currently exploitable.** It is structurally possible; no test proves a live path reaches it. Commit 01's regression test should be written to fail *before* the fix, which will settle it.
