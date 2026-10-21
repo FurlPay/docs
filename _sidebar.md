@@ -21,6 +21,7 @@
 
 * **Deployment & Environments**
   * [Environments (dev / staging / prod)](deploy/ENVIRONMENTS.md)
+  * [Resilience: Principles & Status](deploy/RESILIENCE.md)
   * [AWS Security Baseline](deploy/AWS-SECURITY-BASELINE.md)
   * [Web — Vercel → AWS](deploy/WEB-AWS.md)
   * [Android Release](docs/ANDROID-RELEASE.md)
