@@ -2,10 +2,12 @@
 
 > Audience: integrators, partners and engineers evaluating how FurlPay behaves when part of the infrastructure fails.
 > **Status: PROPOSED.** Every capability below is labelled with one of:
-> - **Live**: running in production;
-> - **Implemented**: in client code, with availability depending on each app's release;
-> - **In review**: written, not yet released;
+> - **Production**: running on furlpay.com;
+> - **Implemented, not deployed**: written and tested, not yet released;
+> - **Implemented in app code**: in the client's code, with availability depending on each app's release;
 > - **Planned**: not built.
+>
+> These are the same categories as the [README's current status](../README.md#current-status-21-october-2026).
 >
 > Nothing labelled Planned should be read as running today.
 
@@ -27,10 +29,10 @@ The lesson applies to anyone building payment infrastructure, including us: **av
 
 | Capability | Status | Notes |
 |---|---|---|
-| Application tier spread across multiple availability zones | **Live** | Serverless functions are multi-AZ by default on our hosting platform. A single-zone failure like 20 October is absorbed at this tier. |
-| Duplicate protection (`Idempotency-Key`) on supporting endpoints | **Live** | Not every endpoint supports it. See [the contract below](#retrying-safely-the-idempotency-contract). |
-| One key per payment intent, reused on retry | **Implemented**: iOS, Android, Wear OS and mobile app code · **In review**: web, browser extension | Each client mints the key once per user action, never once per network attempt. Availability to users depends on each app's release. |
-| Fail-closed sign-in and money limits | **Live** | If the shared rate-limit store is unreachable, authentication and money-movement endpoints refuse requests rather than run unthrottled. |
+| Application tier spread across multiple availability zones | **Production** | Serverless functions are multi-AZ by default on our hosting platform. A single-zone failure like 20 October is absorbed at this tier. |
+| Duplicate protection (`Idempotency-Key`) on supporting endpoints | **Production** | Not every endpoint supports it. See [the contract below](#retrying-safely-the-idempotency-contract). |
+| One key per payment intent, reused on retry | **Implemented in app code**: iOS, Android, Wear OS and mobile app · **Implemented, not deployed**: web, browser extension | Each client mints the key once per user action, never once per network attempt. Availability to users depends on each app's release. |
+| Fail-closed sign-in and money limits | **Production** | If the shared rate-limit store is unreachable, authentication and money-movement endpoints refuse requests rather than run unthrottled. As of 21 October this is active: see the key-value store row in the [current status](../README.md#current-status-21-october-2026). |
 | Multi-AZ AWS deployment (standby) | **Planned** | Infrastructure-as-code exists. **Not yet applied.** |
 | Automatic zonal shift away from an impaired AZ | **Planned** | Requires the AWS deployment, N+1 capacity, and practice runs with outcome alarms. |
 | Multi-region application tier | **Planned** | Not claimed today. |
