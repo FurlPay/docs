@@ -27,19 +27,30 @@ Enterprise-grade technical documentation, AWS cloud migration roadmaps, dedicate
 
 ---
 
-## Current status (15 October 2026)
+## Current status (21 October 2026)
 
-| Area | Today | Plan |
-| :--- | :--- | :--- |
-| **Web app and API** | Next.js 15 on **Vercel** (446 route handlers, 269 pages), serving [furlpay.com](https://furlpay.com) | ECS Fargate behind CloudFront ([runbook](deploy/WEB-AWS.md)) |
-| **Database** | **Supabase Postgres**, reached through PostgREST over HTTP | Aurora PostgreSQL is not a drop-in replacement; see the [engagement brief](aws/AWS-ENGAGEMENT-BRIEF.md) |
-| **Key-value store** | **Upstash Redis** (REST), which holds passkeys, API keys and OAuth clients | Needs a durable AWS design; ElastiCache speaks TCP, not REST |
-| **AI features** | Claude Haiku 4.5 through the Anthropic API | Evaluating Amazon Bedrock |
-| **AWS** | Account set up; **no production workloads**. Active relationship with AWS Startups BD (from TOKEN2049 Singapore, Oct 2026). | Migration planned, not started. Activate credits discussion active; see [TOKEN2049 engagement log](aws/TOKEN2049-AWS-ENGAGEMENT-LOG.md). |
-| **Card issuing** | **Designed, switched off.** No card issuer is contracted | Issuer selection pending |
-| **Banking, on-ramp and off-ramp** | Switched off; no provider contracted | Partner selection pending |
-| **iOS app** | Blocked on an Apple Developer account | [iOS runbook](deploy/IOS-RELEASE.md) |
-| **Security audits** | Reports under `audit/` are **internal reviews**; no third-party audit yet | — |
+Status categories:
+- **Production**: live on furlpay.com.
+- **Implemented, not deployed**: written and tested, not yet released.
+- **Experimental**: works only against a sandbox or mock.
+- **Planned**: not built.
+- **Blocked**: waiting on an external dependency.
+- **Switched off**: built but disabled in production.
+
+| Area | Status | Today | Plan |
+| :--- | :--- | :--- | :--- |
+| **Web app and API** | Production | Next.js 15 on **Vercel** (472 route handlers, 272 pages), serving [furlpay.com](https://furlpay.com). The latest production release shipped on 21 October 2026. Functions run in a single region across multiple availability zones. | ECS Fargate behind CloudFront ([runbook](deploy/WEB-AWS.md)) |
+| **Database** | Production | **Supabase Postgres**, reached through PostgREST over HTTP. Production schema migration status is being verified. Features whose tables are not yet present fail closed rather than run without them. | Aurora PostgreSQL is not a drop-in replacement; see the [engagement brief](aws/AWS-ENGAGEMENT-BRIEF.md) |
+| **Key-value store** | Production, **degraded** | **Upstash Redis** (REST) holds passkeys, API keys, OAuth clients, rate limits and duplicate-request protection. **As of 21 October it is at its plan's capacity limit.** Sign-in and money-movement endpoints that depend on it fail closed (they refuse rather than run unprotected) until capacity is raised. | Raise capacity. The long-term AWS design still needs work, because ElastiCache speaks TCP, not REST. |
+| **Stablecoin payment acceptance** | Switched off | Built, but no settlement assets are enabled in production. The background jobs for merchant payments are not operating. | Enable after the database and capacity items above are resolved |
+| **Bank-network rail (Kinexys)** | Experimental | Adapter tested only against J.P. Morgan's public mock API. Production access is disabled in code, and there is no production credential or banking relationship. | — |
+| **Organizations and roles** | Production (fails closed) | Shipped 21 October. It needs a database migration whose production status is being verified, and refuses requests until that table exists. | — |
+| **AI features** | Production | Claude Haiku 4.5 through the Anthropic API | Evaluating Amazon Bedrock |
+| **AWS** | Planned | Account set up; **no production workloads**. Infrastructure-as-code exists in the application repository and has **not been applied**. Active relationship with AWS Startups BD (from TOKEN2049 Singapore, Oct 2026). | Migration planned, not started. Activate credits discussion active; see the [TOKEN2049 engagement log](aws/TOKEN2049-AWS-ENGAGEMENT-LOG.md) and the [resilience principles and status](deploy/RESILIENCE.md). |
+| **Card issuing** | Switched off | **Designed, switched off.** No card issuer is contracted. | Issuer selection pending |
+| **Banking, on-ramp and off-ramp** | Switched off | No provider contracted | Partner selection pending |
+| **iOS app** | Blocked | Blocked on an Apple Developer account | [iOS runbook](deploy/IOS-RELEASE.md) |
+| **Security audits** | — | Reports under `audit/` are **internal reviews**; no third-party audit yet | — |
 
 What FurlPay can state publicly, and with which qualifiers, is governed by the [verified-claims register](docs/VERIFIED-CLAIMS.md). If a claim is not in its green table, it does not go in an email, a deck or a grant application.
 
@@ -140,10 +151,15 @@ they all share. Start here if you are moving the platform onto AWS.
   Nitro Enclave key custody, detection, supply chain, and a go-live checklist.
 
 * [Web — Vercel → AWS](deploy/WEB-AWS.md)  
-  ECS Fargate behind CloudFront for the app (446 route handlers and 269 pages
-  on 15 October 2026; 314 and 219 when written); why not
+  ECS Fargate behind CloudFront for the app (472 route handlers and 272 pages
+  on 21 October 2026; 314 and 219 when written); why not
   Amplify, Lambda or App Runner; EventBridge for the crons; the cutover and
   rollback plan.
+
+* [Resilience: Principles & Status](deploy/RESILIENCE.md)  
+  How FurlPay is designed to survive a zone outage without charging twice: the
+  status of each resilience capability (production vs. planned), and the
+  `Idempotency-Key` contract integrators should follow when retrying requests.
 
 * [Android Release Runbook](docs/ANDROID-RELEASE.md) · [Play Store Signing](docs/PLAY-SIGNING-RUNBOOK.md)  
   EAS builds, keystore custody, and the Play App Signing step.
@@ -194,7 +210,7 @@ Everything in this section is a **blueprint**: planned, not deployed.
 These are **internal** reviews. FurlPay has not had a third-party security audit.
 
 * [Monorepo Security Review (internal)](audit/FULL_CODEBASE_AUDIT_REPORT.md)  
-  Internal code review across Solana Anchor programs, Next.js API routes, Android/Wear OS native applications, and client SDKs. Uncovers and remediates critical vulnerabilities including the Solana escrow token drain in `auto_release.rs`, merchant wallet fallback to `1111...1111`, WooCommerce/Magento HMAC bypass, Swift timing side-channel leaks, and Android SQLite encryption.
+  Internal code review across Solana Anchor programs, Next.js API routes, Android/Wear OS native applications, and client SDKs, with findings and the fixes made for them. This is an internal review, not a third-party audit, and its remediation claims have not been independently verified. Report security issues to security@furlpay.com rather than relying on this document's status.
 * [Mobile Security Audit & Hardening Guide](docs/MOBILE_SECURITY_AUDIT.md)  
   Analysis of Android and iOS cryptographic boundaries, reverse engineering protections, anti-hooking checks, and biometric authentication gates.
 * [x402 Micropayment Attack Vectors & Mitigation](docs/security/x402-attacks.md)  
