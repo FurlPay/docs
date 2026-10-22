@@ -151,6 +151,8 @@ The AWS migration and post-Alpenglow architecture, with an explicit status (LIVE
   Controls by layer, KMS Ed25519 and secp256k1 signing, payment authorization controls, compliance position.
 * [AWS Data and Event Infrastructure](aws/AWS-DATA-EVENT-INFRASTRUCTURE.md)  
   Which AWS services to use now, which to defer and why; the transactional outbox; managed versus self-operated RPC.
+* [Terraform and Architecture Reconciliation](aws/TERRAFORM-RECONCILIATION-2026-10.md)  
+  Where the never-applied Terraform already matches the target and where it does not: current configuration, target, action, validation and risk for each gap.
 * [Payment Rails and Partner Status](docs/PAYMENT-RAILS-STATUS.md)  
   Every rail with its real status, taken from the feature-flag registry.
 * [Implementation Backlog, October 2026](docs/IMPLEMENTATION-BACKLOG-2026-10.md)  

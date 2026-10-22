@@ -6,7 +6,7 @@
 
 ## 1. What the application depends on today
 
-Counted in the application source at the production commit (code search, 22 October 2026; tests excluded):
+Counted in the application source at commit **`7a392b87`** (`release/2026-10-21`, the build serving furlpay.com as deployment `dpl_Bsz8p…`), by code search on 22 October 2026. Method: occurrences of each data function followed by `(` or a type argument `<`, excluding tests and the data module itself; SQL functions are the distinct string literals passed to the RPC call. Recounted for this revision: **unchanged**.
 
 | Dependency | Count |
 | :--- | :--- |
@@ -18,6 +18,8 @@ Counted in the application source at the production commit (code search, 22 Octo
 | Supabase-specific objects in migrations | Grants to the `anon`, `authenticated` and `service_role` roles; one insert into `storage.buckets` (migration 0038); row-level security enabled on 116 tables, with **no policies** |
 | Supabase Auth (`auth.uid()`, `auth.users`) | **Not used.** FurlPay authenticates users itself (passkeys, OTP, OAuth). Two migrations mention `auth.` only in comments. |
 | Extensions | `citext`, `pg_trgm`, `postgis`: all available on Aurora PostgreSQL |
+
+**Open branches change the totals slightly.** The infrastructure branch (`feat/resilience-hardening`) is identical. The community branch (PR #172, not merged) adds 7 call sites in 1 module, 2 SQL functions and migration 0068, which would make 403 call sites, 74 modules, 70 functions and 59 migrations if merged first.
 
 The PostgREST syntax actually used is a small, regular subset: equality and comparison filters, `in`, `is`, `like`/`ilike`, array containment, `not.`, `or=(…)`, JSON paths (`->`, `->>`), aliases and casts in `select`, one level of embedded related rows, and `order`/`limit`/`offset`.
 
@@ -98,7 +100,19 @@ The feature-branch code currently connects as the schema owner. Switching it to 
 
 ---
 
-## 6. Connections
+## 6. Identity, TLS and network
+
+| Concern | Current Terraform | Required |
+| :--- | :--- | :--- |
+| Who the app connects as | The Aurora **master** user, named `furlpay_app`, with a Terraform-generated password (therefore in Terraform state) | RDS-managed master password in Secrets Manager (`manage_master_user_password`); separate `furlpay_owner` and `furlpay_app` roles (§5); `DATABASE_URL` built for the runtime role |
+| Authentication | Password | Password from Secrets Manager first. **IAM database authentication** (short-lived tokens from the task role) is an option once the runtime role exists; it removes the stored password but adds a token-refresh path to the pool |
+| TLS | `DATABASE_URL` ends `?sslmode=require`; no CA supplied | The RDS CA bundle supplied as `DATABASE_CA_CERT`, with certificate verification proven by a negative test (a wrong CA must fail) |
+| Network | Database accepts 5432 only from the task security group; tasks reach 5432/6379 only inside the VPC | Unchanged. No public endpoint; operators connect through a bastion-less path (SSM Session Manager port forwarding), never a public listener |
+| Provisioning | `enable_aws_data_plane = false` everywhere, so no cluster exists in any plan | Enable per environment after the data layer merges |
+
+Full detail: [Terraform reconciliation](TERRAFORM-RECONCILIATION-2026-10.md), rows T1–T4.
+
+## 7. Connections
 
 - **ECS Fargate tasks are long-lived,** so each task keeps a small pool (default 10, set with `DATABASE_POOL_MAX`) and RDS Proxy is not required for the first release.
 - **RDS Proxy becomes worthwhile** if short-lived workers (Lambda) are added, or if task counts make total connections approach the cluster's limit. Note its pinning rules for PostgreSQL: `SET` and `set_config` pin a session. `TimeZone` is accepted as a startup parameter, so UTC should be passed that way rather than through `options` or `SET` (backlog item).
@@ -107,7 +121,7 @@ The feature-branch code currently connects as the schema owner. Switching it to 
 
 ---
 
-## 7. Storage: Supabase Storage → Amazon S3
+## 8. Storage: Supabase Storage → Amazon S3
 
 | Bucket | Contents | Access |
 | :--- | :--- | :--- |
@@ -115,11 +129,13 @@ The feature-branch code currently connects as the schema owner. Switching it to 
 | `RESEARCH_PDF_BUCKET` | Gated research PDFs | 60-second presigned URL after email verification |
 | Evidence bucket | Payment evidence bundles | **PLANNED** with S3 Object Lock; see [AWS Data and Event Infrastructure](AWS-DATA-EVENT-INFRASTRUCTURE.md) |
 
-All buckets are private (Block Public Access on), encrypted with SSE-KMS, and accessed with the ECS task role's credentials. Requests are signed with SigV4 without an SDK.
+All buckets are private (Block Public Access on), encrypted with SSE-KMS, and accessed with the ECS task role's credentials. Requests are signed with SigV4 without an SDK. **None of these buckets exists in Terraform yet** (reconciliation row T10).
+
+**Moving existing objects.** Copy every object from the Supabase buckets to S3 with its key unchanged. Then verify, per object: byte size equal; SHA-256 of the source bytes equal to the SHA-256 stored with the S3 object (sent as `x-amz-checksum-sha256` on upload, so S3 itself rejects a corrupted transfer); and the onboarding record's stored size equal to the object size (the read path already refuses a mismatch). Report counts of copied, verified and failed objects; cut over only when failures are zero.
 
 ---
 
-## 8. Migration and cutover
+## 9. Migration and cutover
 
 ```mermaid
 sequenceDiagram
@@ -153,13 +169,22 @@ The migration-hygiene rule still holds: applied migrations are never edited, and
 - The `ledger_imbalance` view must report an imbalance of 0.
 - The `payments_missing_ledger` view must be identical before and after.
 
+**Alternative considered: continuous replication.** PostgreSQL logical replication (or AWS DMS) from Supabase into Aurora would shorten the write freeze to the final catch-up. It needs a replication-capable connection to the Supabase project, publications on every table, and care with sequences and functions, which logical replication does not carry. Given FurlPay's small data volume, a dump and restore inside a short maintenance window is simpler and easier to verify. Replication is the fallback if the rehearsal shows the window would be too long.
+
 **Rollback.** Until the first write lands on Aurora, rollback is a configuration change back to Supabase. After that, writes made on Aurora must be replayed to Supabase or the rollback window closes. The cutover is therefore short, scheduled, and preceded by maintenance mode.
 
-**Backups.** Aurora continuous backups with point-in-time recovery, plus a restore drill in staging before cutover. A cross-region snapshot copy is planned. No recovery time has been measured yet.
+**Backups.** Aurora continuous backups with point-in-time recovery (35 days in production, per Terraform), plus a restore drill in staging before cutover. A cross-region snapshot copy is planned. No recovery time has been measured yet.
 
----
+## 10. Failure behaviour after cutover
 
-## 9. Risks
+| Event | Behaviour |
+| :--- | :--- |
+| Writer fails over to the reader | In-flight statements fail and the pool reconnects. Money operations are safe to retry: settlement and receipt functions are idempotent by key, and a status change is conditional on the expected prior status |
+| Database unreachable | Requests that need it return 503; nothing falls back to memory in production |
+| A migration missing in production | Today some paths treat this as "not durable" (ledger gap G2); the requirement is a 503 and a boot-time schema check |
+| Statement exceeds 15 s | Cancelled by `statement_timeout`; the caller sees an error, not a hang |
+
+## 11. Risks
 
 | Risk | Mitigation |
 | :--- | :--- |
@@ -168,3 +193,9 @@ The migration-hygiene rule still holds: applied migrations are never edited, and
 | Runtime role too powerful | Separate owner and app roles before cutover |
 | Connection exhaustion | Per-task pool cap; RDS Proxy if workers are added |
 | Data drift during cutover | Maintenance mode; verified final restore |
+
+## 12. Required application changes (not documentation)
+
+Tracked in the [backlog](../docs/IMPLEMENTATION-BACKLOG-2026-10.md): the data layer and S3 storage (A1, A2), the runtime role (A3), the bootstrap script (A4), `TimeZone` as a startup parameter (A5), Terraform data-plane and secret changes (A6, T1–T4), and moving credentials out of Redis (D2). **None is merged.**
+
+---

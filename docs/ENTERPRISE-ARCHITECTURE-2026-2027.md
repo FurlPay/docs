@@ -57,7 +57,7 @@ flowchart LR
 | :--- | :--- | :--- |
 | Web app and API on Vercel | **LIVE** | furlpay.com. |
 | Supabase Postgres | **LIVE** | 58 SQL migrations in the repository. The app reaches the database only through PostgREST. |
-| Upstash Redis | **LIVE, degraded** | At its plan capacity on 21 October 2026; dependent endpoints fail closed. |
+| Upstash Redis | **LIVE, degraded** | Holds caches **and** credentials (passkeys, API keys, OAuth clients, x402 settlement records). At its plan capacity on 21 October 2026; dependent endpoints fail closed. |
 | Merchant stablecoin acceptance | **IMPLEMENTED, switched off** | No settlement assets enabled in production. |
 | AWS | **PLANNED** | Account exists; Terraform exists and has not been applied. |
 
@@ -102,11 +102,13 @@ flowchart TB
 | :--- | :--- | :--- |
 | Compute | ECS Fargate, multi-AZ | Container parity with local builds; no cold starts on authorization paths; App Runner stopped accepting new customers on 30 April 2026. Full reasoning: [Web — Vercel → AWS](../deploy/WEB-AWS.md). |
 | Edge | CloudFront → WAF → ALB | ALB accepts only CloudFront's managed prefix list plus a secret origin-verify header. |
-| Database | Aurora PostgreSQL 16, Serverless v2 | Already chosen in Terraform. Two instances across Availability Zones for failover; point-in-time recovery. See [§9](#9-database-architecture-and-data-migration). |
+| Database | Aurora PostgreSQL 16, Serverless v2 (2–16 ACU in production) | Already chosen in Terraform. Two instances across Availability Zones for failover; point-in-time recovery. Reached with the native `pg` driver; RDS Proxy added only if short-lived workers or connection counts require it. See [§9](#9-database-architecture-and-data-migration). |
 | Object storage | S3, private, SSE-KMS, Block Public Access | Replaces Supabase Storage for onboarding documents and gated research PDFs. |
 | Schedules | EventBridge → API destination (POST) | Replaces Vercel cron; failed deliveries land in an SQS dead-letter queue. |
 | Secrets and keys | Secrets Manager; KMS | No secrets in images or task definitions. |
 | Solana and EVM access | Managed RPC providers with failover | No self-operated nodes. See [§5](#5-solana-transaction-lifecycle-and-finality-verification). |
+
+**Where the Terraform does not yet match this target:** the AWS data plane (Aurora, ElastiCache, `DATABASE_URL`) is behind a flag that is off in every environment; the app still connects as the database master user; only 5 of the 10 scheduled jobs Vercel runs today are defined; there are no S3 application buckets or KMS signing keys; and the region is set to `eu-west-1` pending a deliberate decision. Each item, with the required action and its risk, is in the [Terraform reconciliation](../aws/TERRAFORM-RECONCILIATION-2026-10.md).
 
 **Deliberately not in the first AWS release:** dedicated Solana RPC nodes, Kinesis, MSK, DynamoDB, Global Accelerator, multi-region active-active. [AWS Data and Event Infrastructure](../aws/AWS-DATA-EVENT-INFRASTRUCTURE.md) explains each.
 
@@ -167,7 +169,7 @@ Rails and partner status in full: [Payment Rails and Partner Status](PAYMENT-RAI
 | :--- | :--- | :--- |
 | End-user wallet keys | On the user's device: Android Keystore, Apple Secure Enclave; SLIP-0010 Ed25519 and BIP-44 secp256k1 derivation | **IMPLEMENTED** in the mobile apps |
 | Server-side MPC signing | A signing route integrates an MPC wallet provider | **IMPLEMENTED**; production use not verified |
-| Platform keys (fee payer, x402 facilitator) | Today: environment secrets. Target: AWS KMS asymmetric keys (Ed25519 for Solana, secp256k1 for EVM), so private keys never leave KMS | **PLANNED** |
+| Platform keys (x402 facilitator; Solana fee payer) | Today: the EVM facilitator key is an environment secret; no Solana fee-payer key is configured. Target: AWS KMS asymmetric keys (Ed25519 for Solana, secp256k1 for EVM), so private keys never leave KMS. This protects the keys; it does not make platform-held funds non-custodial | **PLANNED** |
 | Nitro Enclaves for policy-bound signing | Isolated signing with attestation | **RESEARCH** |
 | Smart-contract accounts (e.g. Safe) | Not integrated | **RESEARCH** |
 
@@ -224,6 +226,7 @@ Comparison of Aurora, RDS and staying on Supabase, the cutover plan and the roll
 | Credit latency p50/p95/p99 per chain, from stored receipts | Operations console | **IMPLEMENTED, TESTED** on a branch (not merged) |
 | Ledger imbalance and payments without ledger entries | Reconciliation queries | **IMPLEMENTED** |
 | Infrastructure alarms, GuardDuty, VPC flow logs, WAF metrics | CloudWatch, SNS | **PLANNED** (in Terraform) |
+| Incident response | Alerts are fingerprinted with a cooldown so a standing outage pages once; money rails can be switched off individually by feature flag; the [resilience page](../deploy/RESILIENCE.md) records what fails closed | Alerting and kill switches **IMPLEMENTED**; an on-call rota and runbooks for AWS are **PLANNED** |
 
 Credit latency is measured from block time to the moment the receipt is recorded, with one-second resolution. It includes finality, polling and RPC time, and is **not** presented as consensus finality.
 
@@ -243,8 +246,8 @@ Summary; the full treatment is in [AWS Security, Cryptographic Signing and Enter
 
 | Concern | Target design | Status |
 | :--- | :--- | :--- |
-| Database failure | Aurora writer and reader in different Availability Zones; automatic failover | **PLANNED**. Terraform's `multi_az` and `deletion_protection` default to off and must be set for production. |
-| Data loss | Aurora continuous backups with point-in-time recovery; cross-region snapshot copy | PITR **PLANNED**; cross-region copy **PLANNED** (not yet in Terraform) |
+| Database failure | Aurora writer and reader in different Availability Zones; automatic failover | **PLANNED**. The production environment file sets `multi_az = true` and `deletion_protection = true` (module defaults are off, for dev). The cluster is not provisioned until the AWS data-plane flag is enabled. |
+| Data loss | Aurora continuous backups with point-in-time recovery (35 days in production, per Terraform); cross-region snapshot copy | PITR **PLANNED**; cross-region copy **PLANNED** (not yet in Terraform) |
 | Zone failure (compute) | ECS tasks spread across three Availability Zones behind the ALB | **PLANNED** |
 | Region failure | Restore into a second region from snapshots | **PLANNED**; no recovery time has been measured |
 | Provider outage (RPC) | Ordered endpoint failover with per-endpoint chain-identity proof | **IMPLEMENTED** |

@@ -1,6 +1,6 @@
 # Solana Alpenglow Integration and Finality Architecture
 
-> **Status, 22 October 2026.** Alpenglow is **LIVE on Solana mainnet** (activated 21 October 2026). FurlPay's Solana payment path already credits only at `finalized` commitment (**IMPLEMENTED**). Consensus detection, Solana chain health and credit-latency measurement are **IMPLEMENTED and TESTED on a feature branch, not merged or deployed**. Status labels are defined in the [enterprise architecture](ENTERPRISE-ARCHITECTURE-2026-2027.md).
+> **Status, 22 October 2026.** Alpenglow's Votor consensus is **LIVE on Solana mainnet** (activated 21 October 2026); Rotor is not yet scheduled. FurlPay's Solana payment path already credits only at `finalized` commitment (**IMPLEMENTED**). Consensus detection, Solana chain health and credit-latency measurement are **IMPLEMENTED and TESTED on a feature branch, not merged or deployed**. Status labels are defined in the [enterprise architecture](ENTERPRISE-ARCHITECTURE-2026-2027.md).
 
 ---
 
@@ -9,13 +9,27 @@
 | Fact | Value | Source |
 | :--- | :--- | :--- |
 | Activation | Epoch 1064, Wednesday 21 October 2026, about 13:36 UTC | solana.com |
-| Feature account `A1pengvuM6JEcyNuTnMqepBKhwHE3N6PmUrdATGawhJS` | Activated at slot **459,648,000**, the first slot of epoch 1064 (1064 × 432,000) | Read from mainnet, 22 October 2026 |
-| Last TowerBFT block (the Alpenglow genesis block) | Slot **459,652,999**, certified by 446 of 654 validators | solana.com; `getAgGenesisCert` on mainnet |
-| First Alpenglow slot | **459,653,000** | solana.com |
+| Feature activation, `X` | Slot **459,648,000**, the first slot of epoch 1064 (1064 × 432,000). The feature account `A1pengvuM6JEcyNuTnMqepBKhwHE3N6PmUrdATGawhJS` records this slot | Read from mainnet, 22 October 2026 |
+| Migration boundary, `S = X + 5000` | Slot **459,653,000**. SIMD-0384 places the boundary 5,000 slots after activation "to avoid the beginning of an epoch". Alpenglow consensus runs from here | SIMD-0384; solana.com |
+| Alpenglow genesis block, `G` | Slot **459,652,999**: the most recent block before the boundary, certified by genesis votes from 446 of 654 validators (the threshold is at least 82% of stake). TowerBFT is disabled for every slot after `G` | SIMD-0384; `getAgGenesisCert` on mainnet |
 | Validator client | Agave v4.3.2 (or the matching Jito and Harmonic builds); Firedancer and Frankendancer are not supported | solana.com |
 | Execution | Unchanged: "the SVM, transactions, programs, and fees stay the same" | solana.com |
 
-The published Agave schedule had expected the feature gate to open on 28 September 2026. It activated three weeks later. This is why FurlPay's code never applies Alpenglow timing on a date (§6).
+```mermaid
+flowchart LR
+    T["TowerBFT<br/>until slot 459,647,999"] --> X["X = 459,648,000<br/>feature activates<br/>epoch 1064 begins"]
+    X --> W["Transition window<br/>vote-only blocks,<br/>no new finality"]
+    W --> G["G = 459,652,999<br/>last block before the boundary<br/>certified by genesis votes"]
+    G --> S["S = 459,653,000<br/>migration boundary X + 5000<br/>Votor consensus from here"]
+```
+
+**The three slot numbers are not interchangeable.** `X` is when the switch began, `S` is the boundary it was scheduled around, and `G` is the block it was anchored to. Sources that quote "slot 459,653,000" as the activation slot mean the boundary, not the feature activation.
+
+**The transition window (`X` to the genesis certificate).** SIMD-0384 has validators pack only simple vote transactions, stop sending optimistic-confirmation updates to RPC services, and stop rooting under TowerBFT. For roughly 5,000 slots (about half an hour at 400 ms per slot), **nothing new became final and user transactions were not included.** Any payment flow open during that window simply waited. FurlPay treats the gate-active-but-no-certificate state as "unknown" for exactly this reason (§7).
+
+The published Agave schedule had expected the feature gate to open on 28 September 2026. It activated three weeks later. This is why FurlPay's code never applies Alpenglow timing on a date (§7).
+
+**Votor is live; Rotor is not.** Alpenglow has two parts. Votor (voting and finality) activated on 21 October 2026. Rotor, which replaces Turbine block propagation, is a later phase with no published activation date.
 
 ---
 
@@ -36,7 +50,19 @@ The block-propagation change (Rotor) is a later phase and is not scheduled.
 
 ---
 
-## 3. Consensus finality is not payment latency
+## 3. Observed finality, 22 October 2026
+
+FurlPay measured finality from its own vantage point rather than quoting the target. For 60 seconds it polled a public mainnet endpoint every 250 ms for the `processed`, `confirmed` and `finalized` slots.
+
+| Observation (207 slots, 22 Oct 2026, about 02:14 UTC) | Value |
+| :--- | :--- |
+| `confirmed` slot equal to `finalized` slot | On every sample |
+| `processed` minus `finalized` | 0–1 slots |
+| Time from a slot first appearing at `processed` to it being `finalized`: p50 / p95 / p99 / max | **263 / 519 / 530 / 547 ms** |
+
+This is an upper bound on protocol finality, not a measurement of it. It includes the 250 ms polling interval and the provider's own propagation. It is consistent with a ~150 ms protocol target plus that overhead. It is a single 60-second sample from one provider, so it is a data point, not a service level.
+
+## 4. Consensus finality is not payment latency
 
 ```mermaid
 flowchart LR
@@ -60,7 +86,7 @@ What a payer experiences is the sum of every box. Alpenglow shortens only box G,
 
 ---
 
-## 4. Commitment levels in FurlPay
+## 5. Commitment levels in FurlPay
 
 | Code path | Commitment | Under Alpenglow |
 | :--- | :--- | :--- |
@@ -75,7 +101,7 @@ The deposit policy for Solana records a nominal depth of 31 confirmations, which
 
 ---
 
-## 5. Streams, `bank_id` and cross-provider reconciliation
+## 6. Streams, `bank_id` and cross-provider reconciliation
 
 FurlPay does not consume Geyser or Yellowstone gRPC streams today; Solana payments are read over JSON-RPC. If streaming is adopted (**RESEARCH**), these rules apply from the first line of code:
 
@@ -87,7 +113,7 @@ FurlPay does not consume Geyser or Yellowstone gRPC streams today; Solana paymen
 
 ---
 
-## 6. Detecting the consensus from the chain
+## 7. Detecting the consensus from the chain
 
 On the feature branch, `lib/chains/solanaConsensus.ts` reports **Alpenglow** only when both of these independent reads agree:
 
@@ -100,7 +126,21 @@ The settlement package follows the same rule: **a date is a plan, a feature gate
 
 ---
 
-## 7. Failure modes and recovery
+## 8. Deposit verification and USDC settlement
+
+How a Solana merchant payment is verified before it is credited (**IMPLEMENTED**; switched off in production):
+
+1. Each payment intent has a single-use destination and a one-time **reference key**. Solana Pay wallets include the reference; a payer who copies the address does not, so transfers into the destination's USDC token account are matched too.
+2. Signatures are listed with `getSignaturesForAddress` at `finalized`, deduplicated, and processed oldest first, starting from the slot recorded when the intent was reserved.
+3. Each transaction is re-read with `getTransaction` at `finalized`. It must have succeeded, must carry the signature it was listed under, and must sit in the slot it was listed at.
+4. If the reference key ever appears as a **signer**, the transaction is ignored. The reference has no private key, so this indicates a forgery attempt.
+5. The amount is the increase in the recipient's balance of the **USDC mint `EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v`**, computed from pre- and post-token balances, and it must have 6 decimals. Any other mint or precision is refused.
+6. Every sender is screened. A transfer outside the intent's time window, or from a screened sender, is held for review.
+7. The credit, receipt, balanced journal and webhook outbox row are written by one database function in one transaction. The receipts key `(chain, tx_hash, log_index)` makes a replay a no-op.
+
+**Transaction submission.** In merchant checkout the payer's wallet submits the transaction, so FurlPay never holds the payer's signature or needs to resubmit. For transactions FurlPay itself submits (platform-paid flows), resubmission is safe only while the transaction's blockhash is valid, and the transaction signature is the idempotency key.
+
+## 9. Failure modes and recovery
 
 | Failure | Behaviour |
 | :--- | :--- |
@@ -115,7 +155,7 @@ The settlement package follows the same rule: **a date is a plan, a feature gate
 
 ---
 
-## 8. Analytics after vote removal
+## 10. Analytics after vote removal
 
 Votes were a majority of Solana's transaction count (published estimates range from just over half to about three-quarters). Headline TPS fell sharply on 21 October 2026 because votes left blocks, not because user activity fell. FurlPay's on-chain analytics count token transfers per mint rather than network-wide TPS, so they are unaffected. Any network TPS chart must be re-baselined and annotated at epoch 1064.
 
@@ -123,6 +163,7 @@ Votes were a majority of Solana's transaction count (published estimates range f
 
 ## Sources
 
-- [solana.com/upgrades/alpenglow](https://solana.com/upgrades/alpenglow) and [Anza: Alpenglow](https://docs.anza.xyz/consensus/alpenglow); SIMD-0326 (consensus), SIMD-0384 (migration), SIMD-0387 (BLS keys in vote accounts).
+- [solana.com/upgrades/alpenglow](https://solana.com/upgrades/alpenglow) and [Anza: Alpenglow](https://docs.anza.xyz/consensus/alpenglow); SIMD-0326 (consensus), [SIMD-0384 (migration)](https://github.com/solana-foundation/solana-improvement-documents/blob/main/proposals/0384-alpenglow-migration.md), SIMD-0387 (BLS keys in vote accounts).
 - [Triton One: Alpenglow and your Triton stack](https://blog.triton.one/alpenglow-and-your-triton-stack-what-to-update-before-mainnet/).
+- Finality observation: `getSlot` at `processed`, `confirmed` and `finalized`, polled every 250 ms for 60 s on a public mainnet endpoint, 22 October 2026.
 - Mainnet JSON-RPC, 22 October 2026: `getAccountInfo` on the feature account, `getAgGenesisCert`, `getVersion` (`solana-core` 4.3.2), `getEpochInfo` (epoch 1064).

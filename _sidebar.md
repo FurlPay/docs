@@ -10,6 +10,7 @@
   * [Ledger, Settlement & Reconciliation](docs/LEDGER-SETTLEMENT-RECONCILIATION.md)
   * [AWS Security & Signing Controls](aws/AWS-SECURITY-SIGNING-CONTROLS.md)
   * [AWS Data & Event Infrastructure](aws/AWS-DATA-EVENT-INFRASTRUCTURE.md)
+  * [Terraform Reconciliation](aws/TERRAFORM-RECONCILIATION-2026-10.md)
   * [Payment Rails & Partner Status](docs/PAYMENT-RAILS-STATUS.md)
   * [Implementation Backlog](docs/IMPLEMENTATION-BACKLOG-2026-10.md)
   * [Master Report Review](reports/ENTERPRISE-MASTER-REPORT-REVIEW-2026-10.md)

@@ -25,11 +25,21 @@
 | :--- | :--- | :--- | :--- |
 | End-user wallet keys | On the user's device (Android Keystore, Apple Secure Enclave) | Unchanged: FurlPay never holds them | **IMPLEMENTED** |
 | Server-side MPC wallets | A signing route co-signs with Turnkey (MPC). Policy is enforced at the point of signing: agent spend policy, plus a single-use authorization bound to the device and challenge | Unchanged | **IMPLEMENTED**; production usage not verified |
-| Platform keys: Solana fee payer, x402 facilitator signer | Environment secrets | **AWS KMS asymmetric keys**: `ECC_NIST_EDWARDS25519` (Ed25519, supported since 7 November 2025) for Solana; `ECC_SECG_P256K1` for EVM. The private key never leaves KMS; each signature is an auditable `Sign` call allowed only to the task role | **PLANNED** |
+| Platform keys: x402 facilitator signer (EVM); Solana fee payer | The EVM facilitator key is an environment secret (`FACILITATOR_EVM_PRIVATE_KEY`). No Solana fee-payer key is configured in production. No key is held in KMS today | **AWS KMS asymmetric keys**: `ECC_NIST_EDWARDS25519` (Ed25519, supported since 7 November 2025) for Solana; `ECC_SECG_P256K1` for EVM. The private key never leaves KMS; each signature is an auditable `Sign` call allowed only to the task role | **PLANNED** |
 | Policy-bound signing in an isolated environment | — | Nitro Enclaves with attestation-conditioned KMS key policies | **RESEARCH** |
 | Dedicated HSM | — | AWS CloudHSM. Not required while KMS meets the need; reconsidered only for a regulatory requirement for single-tenant HSMs | **RESEARCH** |
 | Smart-contract accounts (e.g. Safe) | — | Under evaluation for business treasuries with multi-party approval | **RESEARCH** |
 | Other MPC custody providers | Interface only | Evaluated per partner requirement | **RESEARCH** |
+
+**What KMS guarantees, and what it does not.**
+- KMS asymmetric private keys are generated inside KMS's HSMs and cannot be exported in plaintext. Every use is a `Sign` call authorized by the key policy and IAM, and logged in CloudTrail.
+- KMS does **not** decide *whether* a payment should be signed. That is FurlPay's policy layer (§3). A compromised task role could still ask KMS to sign; the controls are a narrow key policy, the authorization checks before the call, spending limits, and alarms on unusual `Sign` volume.
+- Moving a platform key into KMS changes how that key is protected. It does **not** change custody: funds a platform key controls are still controlled by FurlPay. End-user funds are non-custodial only where the user's device holds the key.
+- **Nitro Enclaves (RESEARCH)** add a further control: a KMS key policy can require a signed enclave attestation (`kms:RecipientAttestation` condition keys), so only a measured enclave image can use the key.
+
+**Separation and revocation.**
+- One key per purpose (fee payer, facilitator), never a treasury key on a hot path. Each key holds only the float its function needs.
+- Revoking a signer means disabling the KMS key or removing the task role from its policy, both effective immediately and both logged. Agent signers are revoked in the control plane: a revoked mandate is refused before limits are even evaluated.
 
 **Rotation and recovery.**
 - KMS asymmetric keys cannot be rotated automatically. Rotation means creating a new key, moving funds or authority to the new address, and disabling the old key after a waiting period.

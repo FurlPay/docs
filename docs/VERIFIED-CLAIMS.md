@@ -44,6 +44,8 @@ Checked against the application source at the production commit, Solana mainnet 
 | Claim | Required qualifier |
 | --- | --- |
 | "Solana finality in about 150 ms" | It is Solana's **consensus** target. It is not FurlPay's end-to-end payment time, which has not yet been published from production samples. |
+| "We observed sub-second finality on mainnet" | One 60-second sample through one public endpoint on 22 October 2026: processed → finalized p50 263 ms, p95 519 ms, including 250 ms polling. A data point, not a service level. |
+| "Alpenglow activated at slot 459,653,000" | That is the migration boundary. The feature activated at slot 459,648,000; the genesis block is slot 459,652,999. |
 | "FurlPay is moving to AWS" | **Decided and started in code; nothing is deployed on AWS.** furlpay.com runs on Vercel, Supabase and Upstash. |
 | "Aurora PostgreSQL" | Chosen and defined in Terraform that has **not been applied**; the data layer is being rewritten on a feature branch. |
 | "Agent payments with mandates, limits and human approval" | Implemented and tested in the application; production usage not stated. |
@@ -56,6 +58,9 @@ Checked against the application source at the production commit, Solana mainnet 
 | --- | --- |
 | FurlPay runs dedicated Solana RPC nodes or validators | It does not, and dedicated nodes are not planned |
 | FurlPay payments complete in 150 ms | Not measured end to end |
+| Rotor is live on Solana | Only Votor activated; Rotor has no published activation date |
+| An RPC provider SLA or agreement | None is in evidence |
+| Any regulatory licence | None is held or claimed in this repository |
 | Any AWS workload, uptime or cost figure as achieved | Nothing is deployed on AWS; cost tables in this repository are models |
 | Yield paid to merchants or users on balances | No such product exists |
 | PCI DSS or SOC 2 certification | Neither is held; both are goals |

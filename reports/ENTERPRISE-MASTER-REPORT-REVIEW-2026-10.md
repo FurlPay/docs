@@ -21,7 +21,7 @@
 | 5 | The payments module falls back to memory "if the database is unreachable" | An unreachable database throws. The in-memory path is taken only when no database is configured or a payments migration is missing. Production refuses to boot without database credentials, so the realistic production risk is a missing migration | Payments module and boot configuration |
 | 6 | A sample connection pool uses `ssl: { rejectUnauthorized: true }` | Without the Amazon RDS CA bundle that configuration cannot verify an RDS certificate, which is not in Node's default trust store. The CA must be supplied | AWS RDS TLS documentation |
 | 7 | "Point all FurlPay code to `finalized`" | Correct after activation, and the merchant Solana path already reads `finalized`. Triton One's guidance is specifically not to switch before activation, because `finalized` then cost 12.8 s | Triton One |
-| 8 | Total latency is 150 ms plus small terms | No end-to-end figure has been measured. FurlPay now measures credit latency (block time to credit, one-second resolution); 150 ms is a consensus target, not a payment time | [Alpenglow document §3](../docs/SOLANA-ALPENGLOW-FINALITY.md#3-consensus-finality-is-not-payment-latency) |
+| 8 | Total latency is 150 ms plus small terms | No end-to-end figure has been measured. FurlPay now measures credit latency (block time to credit, one-second resolution); 150 ms is a consensus target, not a payment time | [Alpenglow document §3–4](../docs/SOLANA-ALPENGLOW-FINALITY.md#4-consensus-finality-is-not-payment-latency) |
 | 9 | Risk and AML run on two named third-party vendors in under 40 ms | Neither vendor is integrated or contracted; the source has only placeholder seams for them. Money routes screen addresses against the OFAC SDN list locally, add Circle's Compliance Engine where configured and Arc's USDC blocklist on Arc, and fail closed. No latency has been measured | Application source |
 | 10 | The payment flow's edge is "AWS Cloudflare / API Gateway" | The planned edge is CloudFront → AWS WAF → ALB. API Gateway is not part of the design | Terraform in the application repository |
 | 11 | Multi-tenant RLS "active and tested" is a gate to pass | RLS is enabled with no policies, and tenant isolation is enforced in the application and tested against real PostgreSQL. The migration keeps RLS on and adds a least-privilege role; database-enforced tenant policies are research | [PostgreSQL migration §5](../aws/AWS-POSTGRESQL-MIGRATION.md#5-tenant-isolation-roles-and-rls) |
@@ -46,3 +46,12 @@
 - Documents specifying Agave v2.x nodes now carry a note: since Alpenglow, mainnet requires Agave v4.3.2, and dedicated nodes are no longer part of the plan.
 - `site-pages/concepts/alpenglow.mdx` and `confirmation-vs-finality.mdx` were one-line stubs; both now state the post-activation facts.
 - The verified-claims register gains dated Alpenglow, AWS-migration and payment-rail rows.
+
+### Second revision, 22 October 2026
+
+- **Corrected our own earlier statement:** the docs said Terraform's `multi_az` and `deletion_protection` had to be set for production. The production environment file already sets both to `true`; only the module defaults are off.
+- **Slot semantics:** 459,648,000 is the feature activation, 459,653,000 the migration boundary (activation + 5,000, per SIMD-0384), 459,652,999 the Alpenglow genesis block. The report used the boundary as the activation slot.
+- **Transition window documented:** between activation and the genesis certificate, blocks carried only votes and nothing new became final.
+- **Observed finality added:** a dated, sourced measurement, labelled as an upper bound rather than a service level.
+- **Terraform reconciled** against the target architecture: 11 rows, including the data-plane flag being off, the app connecting as the database master user, and 5 of 10 scheduled jobs defined.
+- **Inventory recounted** at `7a392b87`: unchanged at 396 call sites, 73 modules and 68 SQL functions; open branches noted.
