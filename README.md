@@ -21,13 +21,15 @@
 [![Terraform](https://img.shields.io/badge/Terraform_IaC-7B42BC?style=for-the-badge&logo=terraform&logoColor=white)](https://www.terraform.io)
 [![Linux](https://img.shields.io/badge/Ubuntu_Linux-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)](https://ubuntu.com)
 
-Enterprise-grade technical documentation, AWS cloud migration roadmaps, dedicated Agave v2.x Solana RPC specifications, Circle CCTP v2 cross-chain rails, Rain JIT virtual-card rail blueprints, and internal security reviews. Documents marked **Blueprint** or **Plan** describe the target architecture, not what runs today.
+Enterprise-grade technical documentation: the AWS migration architecture, Solana Alpenglow finality handling, Circle CCTP v2 cross-chain rails, Rain JIT virtual-card rail blueprints, and internal security reviews. Documents marked **Blueprint** or **Plan** describe the target architecture, not what runs today.
 
 </div>
 
 ---
 
-## Current status (21 October 2026)
+## Current status (22 October 2026)
+
+> **22 October 2026: FurlPay is moving from Vercel and Supabase to AWS.** The decision is made and the work has started in code; **nothing is deployed on AWS yet**. The chosen architecture is in [Enterprise Financial Infrastructure Architecture (2026–2027)](docs/ENTERPRISE-ARCHITECTURE-2026-2027.md).
 
 Status categories:
 - **Production**: live on furlpay.com.
@@ -39,14 +41,15 @@ Status categories:
 
 | Area | Status | Today | Plan |
 | :--- | :--- | :--- | :--- |
-| **Web app and API** | Production | Next.js 15 on **Vercel** (472 route handlers, 272 pages), serving [furlpay.com](https://furlpay.com). The latest production release shipped on 21 October 2026. Functions run in a single region across multiple availability zones. | ECS Fargate behind CloudFront ([runbook](deploy/WEB-AWS.md)) |
-| **Database** | Production | **Supabase Postgres**, reached through PostgREST over HTTP. Production schema migration status is being verified. Features whose tables are not yet present fail closed rather than run without them. | Aurora PostgreSQL is not a drop-in replacement; see the [engagement brief](aws/AWS-ENGAGEMENT-BRIEF.md) |
+| **Web app and API** | Production | Next.js 15 on **Vercel** (472 route handlers, 272 pages), serving [furlpay.com](https://furlpay.com). The latest production release shipped on 21 October 2026. Functions run in a single region across multiple availability zones. **Migration decided 22 October 2026:** ECS Fargate behind CloudFront and AWS WAF ([architecture](docs/ENTERPRISE-ARCHITECTURE-2026-2027.md), [runbook](deploy/WEB-AWS.md)) |
+| **Database** | Production | **Supabase Postgres**, reached through PostgREST over HTTP. Production schema migration status is being verified. Features whose tables are not yet present fail closed rather than run without them. **Decided:** Aurora PostgreSQL reached with the native `pg` driver, and S3 in place of Supabase Storage. The data layer is being rewritten in code (not merged). See the [PostgreSQL migration plan](aws/AWS-POSTGRESQL-MIGRATION.md) |
 | **Key-value store** | Production, **degraded** | **Upstash Redis** (REST) holds passkeys, API keys, OAuth clients, rate limits and duplicate-request protection. **As of 21 October it is at its plan's capacity limit.** Sign-in and money-movement endpoints that depend on it fail closed (they refuse rather than run unprotected) until capacity is raised. | Raise capacity. The long-term AWS design still needs work, because ElastiCache speaks TCP, not REST. |
 | **Stablecoin payment acceptance** | Switched off | Built, but no settlement assets are enabled in production. The background jobs for merchant payments are not operating. | Enable after the database and capacity items above are resolved |
 | **Bank-network rail (Kinexys)** | Experimental | Adapter tested only against J.P. Morgan's public mock API. Production access is disabled in code, and there is no production credential or banking relationship. | — |
 | **Organizations and roles** | Production (fails closed) | Shipped 21 October. It needs a database migration whose production status is being verified, and refuses requests until that table exists. | — |
+| **Solana network** | Production (network) | **Alpenglow is live on mainnet** (21 October 2026, epoch 1064). FurlPay credits Solana payments only at `finalized` commitment, which Alpenglow makes final in a target of about 150 ms (a consensus target, not FurlPay's end-to-end time). | Consensus detection, Solana health checks and measured credit latency are built and tested on a branch ([Alpenglow architecture](docs/SOLANA-ALPENGLOW-FINALITY.md)) |
 | **AI features** | Production | Claude Haiku 4.5 through the Anthropic API | Evaluating Amazon Bedrock |
-| **AWS** | Planned | Account set up; **no production workloads**. Infrastructure-as-code exists in the application repository and has **not been applied**. Active relationship with AWS Startups BD (from TOKEN2049 Singapore, Oct 2026). | Migration planned, not started. Activate credits discussion active; see the [TOKEN2049 engagement log](aws/TOKEN2049-AWS-ENGAGEMENT-LOG.md) and the [resilience principles and status](deploy/RESILIENCE.md). |
+| **AWS** | Planned, **migration decided** | Account set up; **no production workloads**. Infrastructure-as-code exists in the application repository and has **not been applied**. Active relationship with AWS Startups BD (from TOKEN2049 Singapore, Oct 2026). | Migration decided 22 October 2026 and started in code; see the [backlog](docs/IMPLEMENTATION-BACKLOG-2026-10.md). Activate credits discussion active; see the [TOKEN2049 engagement log](aws/TOKEN2049-AWS-ENGAGEMENT-LOG.md) and the [resilience principles and status](deploy/RESILIENCE.md). |
 | **Card issuing** | Switched off | **Designed, switched off.** No card issuer is contracted. | Issuer selection pending |
 | **Banking, on-ramp and off-ramp** | Switched off | No provider contracted | Partner selection pending |
 | **iOS app** | Blocked | Blocked on an Apple Developer account | [iOS runbook](deploy/IOS-RELEASE.md) |
@@ -58,7 +61,7 @@ What FurlPay can state publicly, and with which qualifiers, is governed by the [
 
 ## Target Architecture (AWS migration blueprint)
 
-The diagrams below show the **planned** AWS architecture. None of it is deployed yet.
+The diagrams below show the **planned** AWS architecture. None of it is deployed yet. The decided design as of 22 October 2026, with the status of every component, is in the [enterprise architecture](docs/ENTERPRISE-ARCHITECTURE-2026-2027.md). Figure 1 predates that decision and still shows a dedicated Solana node, which is no longer part of the plan.
 
 <div align="center">
 
@@ -97,10 +100,9 @@ flowchart TD
             Enclave["AWS Nitro Enclaves (Isolated vsock)<br/>KMS Attestation Key Decryption<br/>Relayer & Circle CCTP Mint Signing"]
         end
 
-        subgraph BlockchainTier["Dedicated Blockchain Node Subnet"]
-            SolanaNode["Dedicated Solana RPC Node (EC2 i4i.8xlarge)<br/>Agave v2.2 Validator Engine<br/>3.75TB NVMe RAID-0 + 180GB tmpfs AccountsDB<br/>Yellowstone Dragon's Mouth gRPC Geyser"]
-        end
     end
+
+    SolanaNode["Managed Solana and EVM RPC providers<br/>ordered failover, chain identity proven per endpoint<br/>no self-operated nodes"]
 
     subgraph Rails["Institutional Settlement & Card Networks"]
         Circle["Circle USDC & CCTP v2<br/>TokenMessengerMinterV2 & MessageTransmitterV2<br/>Circle Iris Attestation & Fast Transfers<br/>Circle Mint Fedwire / ACH Clearing"]
@@ -119,7 +121,6 @@ flowchart TD
     ECS --> SolanaNode
     ECS --> Circle
     ECS --> Rain
-    SolanaNode -.->|gRPC Slot Stream| ECS
 ```
 
 <div align="center">
@@ -133,6 +134,30 @@ flowchart TD
 ---
 
 ## Master Documentation Index
+
+### Enterprise architecture (October 2026)
+
+The AWS migration and post-Alpenglow architecture, with an explicit status (LIVE, IMPLEMENTED, TESTED, PLANNED, RESEARCH, BLOCKED) on every component.
+
+* [Enterprise Financial Infrastructure Architecture (2026–2027)](docs/ENTERPRISE-ARCHITECTURE-2026-2027.md)  
+  Current and target topology, system of record, settlement, custody, agent authorization, database, observability, security, disaster recovery, cost assumptions and roadmap.
+* [Solana Alpenglow Integration and Finality Architecture](docs/SOLANA-ALPENGLOW-FINALITY.md)  
+  What changed on 21 October 2026, consensus finality versus payment latency, commitment levels, `bank_id`, failure handling.
+* [AWS PostgreSQL Migration — Supabase to Aurora/RDS](aws/AWS-POSTGRESQL-MIGRATION.md)  
+  The call-site inventory, options compared, the preserved data interface, roles and RLS, connections, storage, cutover and rollback.
+* [Financial Ledger, Settlement and Reconciliation Architecture](docs/LEDGER-SETTLEMENT-RECONCILIATION.md)  
+  What the database already guarantees, the gaps to close before live settlement, and the rules for every money path.
+* [AWS Security, Cryptographic Signing and Enterprise Controls](aws/AWS-SECURITY-SIGNING-CONTROLS.md)  
+  Controls by layer, KMS Ed25519 and secp256k1 signing, payment authorization controls, compliance position.
+* [AWS Data and Event Infrastructure](aws/AWS-DATA-EVENT-INFRASTRUCTURE.md)  
+  Which AWS services to use now, which to defer and why; the transactional outbox; managed versus self-operated RPC.
+* [Payment Rails and Partner Status](docs/PAYMENT-RAILS-STATUS.md)  
+  Every rail with its real status, taken from the feature-flag registry.
+* [Implementation Backlog, October 2026](docs/IMPLEMENTATION-BACKLOG-2026-10.md)  
+  The engineering work, each item with an acceptance check.
+* [Review of the October 2026 Enterprise Master Report](reports/ENTERPRISE-MASTER-REPORT-REVIEW-2026-10.md)  
+  What was kept, corrected and removed, and a change log of factual corrections.
+
 
 ### 0. Deployment & Environments (deploy/)
 
@@ -177,7 +202,7 @@ they all share. Start here if you are moving the platform onto AWS.
 ### 1. Engineering Blog & Technical Articles (blog/)
 
 * [Scaling Stablecoin Payments to Millions: Why FurlPay Is Moving from Shared RPCs to Dedicated AWS Infrastructure](blog/scaling-stablecoin-payments-to-millions-aws.md)  
-  Architecture post on the target design: Visa/Allium real-economy stablecoin data, Singapore's clearing hub, dedicated Agave Solana RPC nodes on EC2 `i4i.8xlarge`, a designed card-authorization path, Circle CCTP v2 burn-and-mint and a modeled 51.2% cost reduction. **The migration has not started**; latency and cost figures are targets.
+  Architecture post on the target design: Visa/Allium real-economy stablecoin data, Singapore's clearing hub, dedicated Agave Solana RPC nodes on EC2 `i4i.8xlarge`, a designed card-authorization path, Circle CCTP v2 burn-and-mint and a modeled 51.2% cost reduction. **Written before the 22 October 2026 decision:** dedicated nodes are no longer planned, and latency and cost figures are targets, not measurements.
 
 ---
 
@@ -195,9 +220,9 @@ Everything in this section is a **blueprint**: planned, not deployed.
 * [1-Year Master Infrastructure & AWS Migration Blueprint (2026–2027)](aws/FURLPAY_1_YEAR_AWS_INFRASTRUCTURE_REPORT.md)  
   Complete 12-month engineering roadmap moving FurlPay from Vercel edge functions and managed RPC providers (Helius/QuickNode) to a private Multi-AZ VPC on Amazon Web Services (AWS).
 * [AWS Infrastructure Cost Model & FinOps Report](aws/FURLPAY_AWS_COST_OPTIMIZATION_REPORT.md)  
-  Modeled cost of the planned architecture, cut from **$44,040/year** to **$21,480/year (51.2%)** by replacing `io2` Block Express IOPS with local Nitro NVMe SSDs (`i4i.8xlarge`), adopting ElastiCache for Valkey and optimizing standby RPC failover. These model a future bill; FurlPay has not incurred this spend.
+  Modeled cost of the planned architecture, cut from **$44,040/year** to **$21,480/year (51.2%)** by replacing `io2` Block Express IOPS with local Nitro NVMe SSDs (`i4i.8xlarge`), adopting ElastiCache for Valkey and optimizing standby RPC failover. These model a future bill; FurlPay has not incurred this spend. **Superseded:** the model assumes self-operated Solana nodes, which the October 2026 architecture does not include.
 * [Credits Funding Plan & Solana Node Specification](aws/FURLPAY_AWS_FREE_TIER_NODE_CONFIG_REPORT.md)  
-  A plan to fund the planned infrastructure with AWS Activate credits and Solana Foundation grants; those credits and grants have **not** been secured. Contains official Agave v2.2 validator arguments, Linux sysctl tuning (`21-agave-validator.conf`), dual NVMe RAID-0 storage scripts, tmpfs AccountsDB setup, Yellowstone Dragon's Mouth gRPC configuration, and automated slot health monitoring.
+  A plan to fund the planned infrastructure with AWS Activate credits and Solana Foundation grants; those credits and grants have **not** been secured. **Superseded for node operations:** since Alpenglow, mainnet requires Agave v4.3.2, and dedicated nodes are no longer planned. Contains Agave v2.2 validator arguments, Linux sysctl tuning (`21-agave-validator.conf`), dual NVMe RAID-0 storage scripts, tmpfs AccountsDB setup, Yellowstone Dragon's Mouth gRPC configuration, and automated slot health monitoring.
 * [AWS Enterprise Security, Compliance & Infrastructure Blueprint (2026–2027)](aws/FURLPAY_AWS_ENTERPRISE_SECURITY_AND_COMPLIANCE_BLUEPRINT.md)  
   Advanced defense-in-depth architecture covering AWS Organizations multi-account governance, KMS envelope encryption with Nitro Enclave PCR attestation, production Terraform IaC modules (VPC, ECS Fargate, WAF v2), a control mapping towards PCI DSS v4.0 and SOC 2 Type II (FurlPay holds neither certification), multi-region disaster recovery runbooks, and SRE alerting matrices.
 * [TOKEN2049 AWS Engagement Log](aws/TOKEN2049-AWS-ENGAGEMENT-LOG.md)  
@@ -274,8 +299,8 @@ These are **internal** reviews. FurlPay has not had a third-party security audit
 | Layer | Technologies & Protocols |
 | :--- | :--- |
 | **Hosting & data (current)** | **Vercel** (Next.js), **Supabase Postgres** via PostgREST, **Upstash Redis** (REST), Anthropic API (Claude Haiku 4.5). |
-| **Cloud & Infrastructure (target)** | **Amazon Web Services (AWS)**, planned: EC2 `i4i.8xlarge`, ECS Fargate, CloudFront, ALB, Aurora PostgreSQL Serverless v2, ElastiCache for Valkey, AWS Nitro Enclaves, AWS KMS, Amazon SNS, CloudWatch, Terraform. |
-| **Dedicated Blockchain Node (target)** | **Agave v2.2.x** (Solana Validator Engine), **Yellowstone Dragon's Mouth gRPC Geyser**, Ubuntu 24.04 LTS, Nitro NVMe RAID-0, Linux tmpfs AccountsDB. |
+| **Cloud & Infrastructure (target, decided 22 Oct 2026)** | **Amazon Web Services (AWS)**: Route 53, CloudFront, AWS WAF, ALB, ECS Fargate, Aurora PostgreSQL 16 Serverless v2 (native `pg` driver), Amazon S3, ElastiCache, Amazon SQS, EventBridge, Secrets Manager, AWS KMS (Ed25519 and secp256k1 signing), CloudWatch, GuardDuty, CloudTrail, Terraform. Nitro Enclaves under research. |
+| **Blockchain access** | Managed RPC providers with ordered failover; each endpoint must prove it serves the right chain. **No self-operated nodes are planned** (Solana mainnet now requires Agave v4.3.2; see [AWS Data and Event Infrastructure](aws/AWS-DATA-EVENT-INFRASTRUCTURE.md#4-managed-versus-self-operated-solana-rpc)). |
 | **Cross-Chain & Stablecoins**| **Circle USDC**, **Circle CCTP v2** (`MessageTransmitterV2`, `TokenMessengerMinterV2`), Circle Iris Attestation API, Circle Mint API, Circle Programmable Wallets, Circle Arc. |
 | **Card Issuing: Rain JIT rails (plan)** | Rain virtual cards with just-in-time authorization against USDC balances, atomic holds and daily reconciliation ([plan](docs/VIRTUAL-CARD-JIT-RAILS-PLAN.md)). **No issuer is contracted; card issuing is switched off.** |
 | **Backend Application** | **Next.js 15 (App Router)**, Node.js 22, TypeScript 5.5, Zod, Viem, `@solana/web3.js`, EIP-3009 Gasless Relay Engine, EIP-712 Typed Signing. |

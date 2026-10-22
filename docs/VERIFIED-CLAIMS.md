@@ -1,6 +1,6 @@
 # FurlPay — verified claims register
 
-**Last verified 2026-09-13.** Every row was checked against the repository or
+**Last verified 2026-09-13; §0 added 2026-10-22.** Every row was checked against the repository or
 Solana mainnet on that date. This file exists so that anything FurlPay says to a
 grant committee, an investor, or a user can be traced to evidence before it is
 sent.
@@ -21,6 +21,45 @@ kind of thing that disqualifies an applicant when diligence finds it — and the
 diligence here is easy, because the repository is open source and the chain is
 public. A correction sent within days reads as rigor. The same correction
 extracted during review reads as something else.
+
+---
+
+## 0. Additions, 22 October 2026
+
+Checked against the application source at the production commit, Solana mainnet and vendor documentation on 22 October 2026. Earlier sections keep their original date.
+
+**GREEN: verifiable**
+
+| Claim | Evidence |
+| --- | --- |
+| Solana's Alpenglow consensus is live on mainnet since 21 October 2026 (epoch 1064) | Feature account `A1pengvu…GawhJS` activated at slot 459,648,000; `getAgGenesisCert` returns the certificate for slot 459,652,999 |
+| FurlPay credits Solana payments only at `finalized` commitment | Merchant verifier reads signatures and transactions at `finalized` |
+| The ledger refuses unbalanced transactions and never edits postings | `ledger_post` balance check; append-only trigger on `ledger_postings` (migration 0009) |
+| Settlement is atomic and idempotent under concurrency | `settle_payment_atomic` row lock (migration 0009) |
+| An on-chain transfer can be credited only once | Primary key `(chain, tx_hash, log_index)` on merchant receipts (migration 0040) |
+| FurlPay has decided to move from Vercel and Supabase to AWS | Decision of 22 October 2026; [enterprise architecture](ENTERPRISE-ARCHITECTURE-2026-2027.md) |
+
+**AMBER: true with a qualifier**
+
+| Claim | Required qualifier |
+| --- | --- |
+| "Solana finality in about 150 ms" | It is Solana's **consensus** target. It is not FurlPay's end-to-end payment time, which has not yet been published from production samples. |
+| "FurlPay is moving to AWS" | **Decided and started in code; nothing is deployed on AWS.** furlpay.com runs on Vercel, Supabase and Upstash. |
+| "Aurora PostgreSQL" | Chosen and defined in Terraform that has **not been applied**; the data layer is being rewritten on a feature branch. |
+| "Agent payments with mandates, limits and human approval" | Implemented and tested in the application; production usage not stated. |
+| "Merchant stablecoin checkout on seven chains" | Implemented; **switched off in production** (no settlement assets enabled). |
+| "Sanctions screening" | Money routes screen against the OFAC SDN list, plus Circle's Compliance Engine where configured. Do not name other screening vendors. |
+
+**RED: do not claim**
+
+| Do not claim | Reality |
+| --- | --- |
+| FurlPay runs dedicated Solana RPC nodes or validators | It does not, and dedicated nodes are not planned |
+| FurlPay payments complete in 150 ms | Not measured end to end |
+| Any AWS workload, uptime or cost figure as achieved | Nothing is deployed on AWS; cost tables in this repository are models |
+| Yield paid to merchants or users on balances | No such product exists |
+| PCI DSS or SOC 2 certification | Neither is held; both are goals |
+| A specific take rate compared with named competitors | No such published pricing; public material does not name competitors |
 
 ---
 
