@@ -3,6 +3,8 @@
 **By FurlPay Architecture Team**  
 *7 min read · Published September 2026*
 
+> **Status note, 22 October 2026.** This post describes a target design written before FurlPay's AWS decision. FurlPay is now moving to AWS with **managed** Solana RPC providers, not dedicated nodes; nothing in this post is deployed. The current plan is the [enterprise architecture](../docs/ENTERPRISE-ARCHITECTURE-2026-2027.md). Card issuing is switched off and no card issuer is contracted.
+
 ---
 
 Global stablecoin payment volume is no longer theoretical.
@@ -48,7 +50,7 @@ To deliver true sub-second payment settlement, we required an infrastructure top
 
 ## 2. The Architectural Blueprint: Dedicated High-Performance Solana Nodes on AWS
 
-To eliminate third-party dependencies, we deployed dedicated, non-voting Solana RPC nodes running the official **Agave v2.2 validator client** inside our private AWS Virtual Private Cloud (VPC).
+The design called for dedicated, non-voting Solana RPC nodes running the **Agave v2.2 validator client** inside a private AWS Virtual Private Cloud (VPC). **Correction (22 October 2026): these nodes were never deployed.** FurlPay uses managed RPC providers with failover, and since Solana's Alpenglow upgrade, mainnet requires Agave v4.3.2.
 
 ```
 +-------------------------------------------------------------------------+

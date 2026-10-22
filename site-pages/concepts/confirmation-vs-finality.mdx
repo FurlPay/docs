@@ -1,2 +1,14 @@
 # Confirmation vs Finality
-400ms confirmation vs 12.8s finality vs 150ms alpenglow.
+
+A **confirmed** transaction is in a block that the network has voted for. A **final** transaction cannot be reversed.
+
+| Network | Confirmed | Final |
+| :--- | :--- | :--- |
+| Solana, before 21 October 2026 (TowerBFT) | about 400 ms (optimistic) | about 12.8 s |
+| Solana, from 21 October 2026 (Alpenglow) | the same state as final | target about 150 ms |
+| Ethereum | about 12 s per block | about two epochs (roughly 13 minutes) |
+| Optimistic rollups (Base, Arbitrum) | about 0.25–2 s | no bounded finality on the rollup alone |
+
+FurlPay credits a payment only at the depth its deposit policy requires for that chain. On Solana that means `finalized` commitment. A merchant integration should treat a payment as complete only when FurlPay reports it as paid, not when a wallet shows a transaction as sent.
+
+See [Alpenglow](./alpenglow) and [Settlement tiers](./settlement-tiers).
