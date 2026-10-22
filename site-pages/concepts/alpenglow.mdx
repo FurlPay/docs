@@ -1,2 +1,23 @@
 # Alpenglow
-Alpenglow readiness explanation.
+
+Alpenglow is Solana's consensus protocol. It replaced TowerBFT on mainnet on **21 October 2026**, at the start of epoch 1064. Alpenglow consensus runs from slot 459,653,000.
+
+## What it changes for a payment
+
+- **Finality is faster.** Under TowerBFT a block became final after about 12.8 seconds. Alpenglow targets about **150 milliseconds**. That is a target, not a constant.
+- **`confirmed` and `finalized` mean the same thing.** A transaction that is confirmed is now final.
+- **Nothing changes for transactions themselves.** Programs, fees and transaction formats are the same.
+
+## What it does not change at FurlPay
+
+FurlPay credits a Solana payment only once it is **finalized**, as it did before Alpenglow. Alpenglow makes that happen sooner.
+
+150 ms is how long Solana's consensus takes. It is not how long a FurlPay payment takes from start to finish: signing, policy and compliance checks, submission, detection and recording all add time. FurlPay measures that end-to-end figure rather than assuming it.
+
+## For integrators
+
+- If you only send transactions and read accounts, you do not need to change anything.
+- If you consume block or transaction streams, group updates by `(slot, bank_id)`, and match blocks across providers by blockhash, never by `bank_id`.
+- Network transaction counts fell when votes stopped being transactions. Re-baseline any TPS chart at epoch 1064.
+
+Engineering detail: [Solana Alpenglow Integration and Finality Architecture](https://github.com/FurlPay/docs/blob/main/docs/SOLANA-ALPENGLOW-FINALITY.md).

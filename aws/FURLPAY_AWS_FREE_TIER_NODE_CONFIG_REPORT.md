@@ -1,5 +1,7 @@
 # FurlPay: Zero-Cash AWS Blueprint & Production Solana Node Specification (2026–2027)
 
+> **Superseded in part, 22 October 2026.** Solana's Alpenglow upgrade (21 October 2026) requires Agave v4.3.2 on mainnet, so the Agave v2.x node configuration below cannot follow mainnet. Dedicated Solana nodes are no longer part of FurlPay's plan; see [AWS Data and Event Infrastructure](AWS-DATA-EVENT-INFRASTRUCTURE.md#4-managed-versus-self-operated-solana-rpc) and the [enterprise architecture](../docs/ENTERPRISE-ARCHITECTURE-2026-2027.md).
+
 > **Status, 15 October 2026: blueprint, not deployed.** This document describes FurlPay's planned AWS architecture. Production runs on Vercel, Supabase Postgres and Upstash Redis today, and no AWS workloads are live. Card issuing is designed but switched off, and no card issuer is contracted. Latency, throughput, cost and savings figures here are design targets or models, not measurements. External claims are governed by the [verified-claims register](../docs/VERIFIED-CLAIMS.md). The credits and grants this plan assumes have not been secured. AWS Activate grants above $1,000 require affiliation with an Activate Provider.
 ### Running 100% Free on AWS via Capital Stacking + Complete Agave v2.x Node Configuration
 

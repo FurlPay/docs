@@ -1,5 +1,7 @@
 # FurlPay: AWS Enterprise Security, Compliance & Infrastructure Blueprint (2026–2027)
 
+> **Superseded in part, 22 October 2026.** Solana's Alpenglow upgrade (21 October 2026) requires Agave v4.3.2 on mainnet, so the Agave v2.x node configuration below cannot follow mainnet. Dedicated Solana nodes are no longer part of FurlPay's plan; see [AWS Data and Event Infrastructure](AWS-DATA-EVENT-INFRASTRUCTURE.md#4-managed-versus-self-operated-solana-rpc) and the [enterprise architecture](../docs/ENTERPRISE-ARCHITECTURE-2026-2027.md).
+
 > **Status, 15 October 2026: blueprint, not deployed.** This document describes FurlPay's planned AWS architecture. Production runs on Vercel, Supabase Postgres and Upstash Redis today, and no AWS workloads are live. Card issuing is designed but switched off, and no card issuer is contracted. Latency, throughput, cost and savings figures here are design targets or models, not measurements. External claims are governed by the [verified-claims register](../docs/VERIFIED-CLAIMS.md). FurlPay holds no PCI DSS or SOC 2 certification; the controls below are a mapping towards them.
 ### Advanced Defense-in-Depth, Zero-Trust IAM, PCI-DSS / SOC 2 Compliance, Terraform IaC, and Disaster Recovery Architecture
 
