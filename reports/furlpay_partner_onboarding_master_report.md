@@ -34,7 +34,7 @@
    - 6.2 Webhook Testing, Simulation & Event Log Streaming
    - 6.3 Settlement & Payout Reconciliation Dashboard
    - 6.4 Revenue Share & Affiliate Tracking
-7. [API Route Specifications & Zod Validation Contracts](#7-api-route-specifications--zod-validation-contracts)
+7. [API Route Specifications & Zod Contracts](#7-api-route-specifications--zod-contracts)
 8. [Master Implementation Roadmap & Phased Rollout](#8-master-implementation-roadmap--phased-rollout)
 
 ---

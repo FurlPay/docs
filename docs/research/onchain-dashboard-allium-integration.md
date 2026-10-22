@@ -25,7 +25,7 @@
 
 ### Overview
 
-The FurlPay Onchain Intelligence dashboard is a **full-stack, source-aware analytics platform** at [`/onchain`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/apps/web/src/app/onchain/page.tsx). It uses a terminal-style dark UI with real-time data polling.
+The FurlPay Onchain Intelligence dashboard is a **full-stack, source-aware analytics platform** at [`/onchain`](https://furlpay.com/onchain). It uses a terminal-style dark UI with real-time data polling.
 
 ### Architecture Diagram
 
@@ -150,7 +150,7 @@ flowchart TD
 
 ## 3. Allium Client — Already Built
 
-FurlPay already has a production-ready Allium REST API client at [`lib/allium/client.ts`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/apps/web/src/lib/allium/client.ts).
+FurlPay already has a production-ready Allium REST API client at `apps/web/src/lib/allium/client.ts`.
 
 ### Client Capabilities
 
@@ -178,7 +178,7 @@ runExplorerQuery(sql)                 // Custom SQL (async)
 
 ### Compatibility Shim
 
-[`lib/allium/onchain-data.ts`](file:///c:/Users/ashut/OneDrive/Documents/Payment%20App/apps/web/src/lib/allium/onchain-data.ts) re-exports the dashboard builder through an Allium-named path. This was the original integration point before the dashboard was refactored to be provider-independent.
+`apps/web/src/lib/allium/onchain-data.ts` re-exports the dashboard builder through an Allium-named path. This was the original integration point before the dashboard was refactored to be provider-independent.
 
 ---
 
