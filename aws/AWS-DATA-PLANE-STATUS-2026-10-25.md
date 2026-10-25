@@ -13,7 +13,9 @@ flowchart LR
     PX -- TLS --> AU[(Aurora PostgreSQL<br/>Serverless v2)]
     ECS -- "TLS + auth token" --> VK[(ElastiCache for Valkey)]
     ECS --> S3[(S3, private buckets)]
-    EB[EventBridge schedules] --> CF
+    EB[EventBridge schedules] --> Q[(SQS queue)]
+    Q --> WK["Worker task<br/>(runs scheduled jobs)"]
+    WK --> PX
     ECS --> RPC[Managed RPC providers]
 ```
 
@@ -33,7 +35,11 @@ Region eu-west-1. No self-operated blockchain nodes, no Lightning infrastructure
 | Middleware on the Node.js runtime | **Verified in the production build** | — |
 | No server-only module in browser bundles | **Verified** | Build output scan plus a test over every client component's imports |
 | Private S3 buckets for onboarding documents and research PDFs | **Implemented, not verified on AWS** | Block Public Access, ACLs disabled, SSE-KMS, TLS-only |
-| Scheduled jobs: every current Vercel job has an EventBridge equivalent | **Implemented, not verified on AWS; disabled by default** | Enabled per environment only when Vercel no longer runs the same jobs against that database |
+| Scheduled jobs: every current Vercel job has an EventBridge equivalent, delivered as a queue message to a worker service | **Implemented, not verified on AWS; disabled by default** | A tick is removed from the queue only after its job has answered successfully; a crash or failure leaves it to be retried, then dead-lettered with an alarm. Enabled per environment only when Vercel no longer runs the same jobs against that database |
+| Merchant-payment outbox: payment, ledger journal and webhook event commit in one transaction | **Implemented, tested on PostgreSQL** | 10 concurrent deliveries of one transfer settle once; concurrent workers never claim the same event; a crashed worker's event is retried after its lease; a stale worker cannot override a newer one (new fencing) |
+| Progressive finality for received payments: observed, safe, finalized, or reorganized | **Implemented, tested on PostgreSQL and recorded fixtures** | On rollups a payment is first seen on the sequencer's head; it is marked final only from the chain's own `safe`/`finalized` blocks. A reorganization moves the payment to review and reverses nothing automatically. **Refunds wait for finality** |
+| Fee-payer (gas) signing: daily gas budget; AWS KMS secp256k1 signer | **Implemented, tested locally; no key created** | The fee payer holds gas only, never customer funds. Production requires a budget and a key outside the application process |
+| Optional chain streams (EVM WebSocket logs, Base Flashblocks, Solana Yellowstone core) | **Implemented as hints, tested on fixtures; off by default** | A streamed transfer only makes the verifier look sooner; nothing is booked from a stream. Needs a provider; Base's public endpoints are HTTP only |
 | Hedged read-only RPC requests across managed providers | **Implemented, tested; off by default** | Broadcasts are never hedged |
 | Latency metrics (database, key-value, RPC, event loop) and alarms | **Implemented, tested locally** | — |
 | Infrastructure as code | **Validated, not applied** | `terraform validate` for every environment; plan-level tests with mocked providers. No plan against real AWS state yet |
@@ -56,3 +62,4 @@ Only a **local** benchmark (one developer machine, embedded PostgreSQL, no netwo
 - A real Valkey server for the key-value integration suite.
 - AWS credentials for a staging `terraform plan`, then an approved staging apply.
 - A cutover rehearsal on staging before any production plan.
+- Product decision: whether merchants get a separate "payment finalized" webhook event.
