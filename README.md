@@ -161,6 +161,8 @@ The AWS migration and post-Alpenglow architecture, with an explicit status (LIVE
   The engineering work, each item with an acceptance check.
 * [Review of the October 2026 Enterprise Master Report](reports/ENTERPRISE-MASTER-REPORT-REVIEW-2026-10.md)  
   What was kept, corrected and removed, and a change log of factual corrections.
+* [Review of the P1–Pn AWS Infrastructure Audit (26 Oct)](reports/AWS-INFRASTRUCTURE-AUDIT-REVIEW-2026-10-26.md)  
+  What was already in place, what was fixed as a result, and the findings that were wrong, including the database region.
 
 
 ### 0. Deployment & Environments (deploy/)

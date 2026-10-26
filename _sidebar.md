@@ -15,6 +15,7 @@
   * [Payment Rails & Partner Status](docs/PAYMENT-RAILS-STATUS.md)
   * [Implementation Backlog](docs/IMPLEMENTATION-BACKLOG-2026-10.md)
   * [Master Report Review](reports/ENTERPRISE-MASTER-REPORT-REVIEW-2026-10.md)
+  * [P1–Pn AWS Audit Review (26 Oct)](reports/AWS-INFRASTRUCTURE-AUDIT-REVIEW-2026-10-26.md)
 
 * **AWS Infrastructure (blueprints)**
   * [AWS Engagement Brief](aws/AWS-ENGAGEMENT-BRIEF.md)

@@ -120,4 +120,8 @@ These figures are a model to confirm in the AWS Pricing Calculator. FurlPay has 
 - moving the gas fee-payer key into AWS KMS;
 - reconciling the fiat balance against the ledger;
 - issuer-backed card holds;
-- a durable agent spending cap.
+- a durable agent spending cap;
+- passkeys and API keys moved from the key-value store into PostgreSQL;
+- an outbound-traffic allowlist (network firewall or egress proxy), priced first.
+
+Later the same day, a further infrastructure audit was reviewed. That review split the encryption keys by data domain, which also fixed alarm delivery; added a read-only restore drill script; and enabled zonal shift on the load balancer. Details: [review of the P1–Pn AWS infrastructure audit](../reports/AWS-INFRASTRUCTURE-AUDIT-REVIEW-2026-10-26.md).
