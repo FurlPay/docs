@@ -6,7 +6,7 @@
 * **Enterprise Architecture (Oct 2026)**
   * [Enterprise Architecture 2026–2027](docs/ENTERPRISE-ARCHITECTURE-2026-2027.md)
   * [Solana Alpenglow & Finality](docs/SOLANA-ALPENGLOW-FINALITY.md)
-  * [AWS Data Plane Status (25 Oct)](aws/AWS-DATA-PLANE-STATUS-2026-10-25.md)
+  * [AWS Data Plane Status (26 Oct)](aws/AWS-DATA-PLANE-STATUS-2026-10-25.md)
   * [AWS PostgreSQL Migration](aws/AWS-POSTGRESQL-MIGRATION.md)
   * [Ledger, Settlement & Reconciliation](docs/LEDGER-SETTLEMENT-RECONCILIATION.md)
   * [AWS Security & Signing Controls](aws/AWS-SECURITY-SIGNING-CONTROLS.md)

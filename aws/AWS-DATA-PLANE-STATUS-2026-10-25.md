@@ -1,4 +1,4 @@
-# AWS data plane: implementation status (25 October 2026)
+# AWS data plane: implementation status (25 October 2026, updated 26 October)
 
 > **Nothing described here is deployed.** furlpay.com runs on Vercel, Supabase and Upstash. This page records what has been **implemented and tested in the application repository** for the AWS move decided on 22 October 2026, what has **not been verified on AWS**, and what is **blocked**. It supersedes the "in progress" status in the [PostgreSQL migration plan](AWS-POSTGRESQL-MIGRATION.md). Status labels follow the [enterprise architecture](../docs/ENTERPRISE-ARCHITECTURE-2026-2027.md).
 
@@ -63,3 +63,61 @@ Only a **local** benchmark (one developer machine, embedded PostgreSQL, no netwo
 - AWS credentials for a staging `terraform plan`, then an approved staging apply.
 - A cutover rehearsal on staging before any production plan.
 - Product decision: whether merchants get a separate "payment finalized" webhook event.
+
+## Update, 26 October 2026
+
+Still **nothing deployed**. The implementation is now published in the application repository as a branch under review, with a follow-up branch stacked on it.
+
+### Review of external architecture reports
+
+Two externally produced architecture reports were checked against the code and against primary sources.
+
+**Already implemented** (the reports had called these missing):
+- the transactional outbox;
+- progressive payment finality;
+- chain streams used as hints only.
+
+**Rejected.** These prescriptions are not part of the design:
+
+| Prescription | Why |
+|---|---|
+| Staging balances in the key-value store before writing them to the database | The ledger stays in PostgreSQL. A cache failover must never lose an acknowledged movement. |
+| Multiple regions writing to the ledger | One writable ledger only. Read replicas and disaster recovery are separate questions. |
+| A hardcoded list of Jito tip accounts | Tip accounts are discovered from the block engine. FurlPay does not submit Solana payments server-side today, so no Jito path exists. |
+| The reports' sample Yellowstone subscriber | It hex-encodes base58 public keys and mislabels commitment levels. The existing stream core subscribes at `finalized` and only prompts the verifier. |
+
+**Alpenglow.** It activated on mainnet on 21 October 2026. About 150 ms is the protocol's finality *target*, and FurlPay states no latency guarantee.
+
+### Fixes since 25 October (in code, not deployed)
+
+- **Card authorization:** a step-up (3-D Secure) approval now debits the balance exactly once, under the same lock and checks as a frictionless approval. Card issuing remains **switched off**: no issuer is contracted.
+- **Agent mandates (AP2):** exact amount handling; mandate timestamps must fall within the authorization window; category allowlists are enforced.
+- **Dependencies:** security updates to the web framework and an HTML sanitizer.
+- **Validation in the application repository:** 9,216 tests passing and 0 failing, a clean typecheck, a successful production build. CI on the branch has not yet run.
+
+### Modeled monthly cost floor (not a bill)
+
+The floor is the Terraform as written, at minimum capacity and list prices in eu-west-1, before traffic, data transfer and log volume.
+
+| Environment | Monthly floor |
+|---|---|
+| Development | about $210 |
+| Staging | about $440 |
+| Production | about $1,030 |
+
+Production at its configured maximum capacity would be roughly **$4,100+**. The largest fixed lines are:
+- Aurora;
+- the RDS Proxy minimum (8 ACUs);
+- private network endpoints in three zones;
+- NAT gateways.
+
+These figures are a model to confirm in the AWS Pricing Calculator. FurlPay has incurred none of this spend.
+
+### Still open before production
+
+- an approved staging apply, followed by live tests of the database proxy, Valkey and the scheduled-job path;
+- a disaster-recovery design with a single writable database, plus a restore test;
+- moving the gas fee-payer key into AWS KMS;
+- reconciling the fiat balance against the ledger;
+- issuer-backed card holds;
+- a durable agent spending cap.

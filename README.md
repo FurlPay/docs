@@ -27,9 +27,11 @@ Enterprise-grade technical documentation: the AWS migration architecture, Solana
 
 ---
 
-## Current status (22 October 2026)
+## Current status (26 October 2026)
 
 > **22 October 2026: FurlPay is moving from Vercel and Supabase to AWS.** The decision is made and the work has started in code; **nothing is deployed on AWS yet**. The chosen architecture is in [Enterprise Financial Infrastructure Architecture (2026–2027)](docs/ENTERPRISE-ARCHITECTURE-2026-2027.md).
+>
+> **26 October 2026:** the AWS data plane is implemented and validated in the application repository and **still not applied**; production is unchanged. What is done, what is unverified on AWS, the modeled cost floor and the latest review are in the [AWS data plane status](aws/AWS-DATA-PLANE-STATUS-2026-10-25.md).
 
 Status categories:
 - **Production**: live on furlpay.com.
