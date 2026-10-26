@@ -1,5 +1,7 @@
 # AWS PostgreSQL Migration — Supabase to Aurora/RDS
 
+> **Update, 25 October 2026:** the data layer, roles and cutover guard are now implemented and tested locally, not deployed. Current status: [AWS data plane status](AWS-DATA-PLANE-STATUS-2026-10-25.md).
+>
 > **Status, 22 October 2026.** **Decided:** FurlPay will run on Amazon Aurora PostgreSQL, reached with the native Node.js `pg` driver, with Amazon S3 in place of Supabase Storage. **In progress:** the data layer is being rewritten in the application repository; it is not merged. **Not started:** no AWS database exists; production still runs on Supabase. Status labels are defined in the [enterprise architecture](../docs/ENTERPRISE-ARCHITECTURE-2026-2027.md).
 
 ---
