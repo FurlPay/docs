@@ -308,3 +308,41 @@ Empirical measurements gathered via real-time SSE stream consumption over HTTP (
 
 ---
 *Report generated from genuine Cargo, Criterion, and furlpay-eval test runs.*
+
+
+---
+
+## Addendum: v0.2.0 Update (November 9, 2026)
+
+### Summary
+
+FurlPay Search v0.2.0 introduces two major subsystems on top of the Milestone 1 foundation:
+
+1. **Adaptive Hierarchical Ranking Engine** — replaces length-based query classification with intent-based classification (9 `QueryIntent` variants), implements 3-stage hierarchical scoring to prevent correlated signal double-counting, and separates `implementation_completeness` from `implementation_status_match`.
+
+2. **Progressive Web Discovery with Content Extraction** — wires the existing `Deduplicator` (URL normalization + XXH3 content hashing) and `HtmlExtractor` into the live web pipeline, adding page-level content extraction for the top 5 results and progressive SSE events.
+
+### Updated Test Results
+
+| Metric | v0.1.0 | v0.2.0 |
+|--------|--------|--------|
+| Total unit tests passing | 25 | **125** (66 core + 55 web + 4 SIMD) |
+| Intent classification queries | N/A | 8/8 correct |
+| Regression benchmark queries | N/A | 11/11 pass |
+| Additional edge case queries | N/A | 6/6 pass |
+| Web search deduplication | Inline simple | Proper `Deduplicator` (tracking params, fragments, content hash) |
+| Web page extraction | Not attempted | Top 5 results: ContentExtracted |
+| SSE event types (web search) | 4 | 7 (+ discovery.started, discovery.completed, extraction.completed) |
+
+### New Verification Levels
+
+| Level | Evidence |
+|-------|----------|
+| `SearchHitReceived` | URL + title + snippet from HTTPS search API |
+| `PageFetched` | HTTP GET completed, actual status code recorded |
+| `ContentExtracted` | HTML parsed: title, main text, metadata, word count extracted |
+
+### Repository
+
+- **Source:** [github.com/FurlPay/furlpay-search](https://github.com/FurlPay/furlpay-search)
+- **Architecture doc:** [FURLPAY-SEARCH-v0.2.0-ARCHITECTURE-AND-BENCHMARK](docs/FURLPAY-SEARCH-v0.2.0-ARCHITECTURE-AND-BENCHMARK.md)
