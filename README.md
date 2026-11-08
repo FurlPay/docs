@@ -4,26 +4,54 @@
 
 ![FurlPay Banner](https://raw.githubusercontent.com/FurlPay/.github/main/profile/banner.png)
 
-### Digital-Dollar Payment Infrastructure: Documentation & Blueprints
+### Digital-Dollar Payment Infrastructure & AI Retrieval Architecture
+
+[![📖 Read Our Live Docs](https://img.shields.io/badge/📖_Read_Our_Live_Docs-furlpay.github.io%2Fdocs-007AFF?style=for-the-badge&logo=gitbook&logoColor=white)](https://furlpay.github.io/docs/#/)
+[![Docsify SPA](https://img.shields.io/badge/Docsify-v4_SPA-42b983?style=for-the-badge&logo=vue.js&logoColor=white)](https://furlpay.github.io/docs/#/)
+[![GitHub Pages](https://img.shields.io/badge/GitHub_Pages-Live_Docs_Active-222222?style=for-the-badge&logo=githubpages&logoColor=white)](https://furlpay.github.io/docs/#/)
+[![AI Search Master Plan](https://img.shields.io/badge/AI_Search-v1.1_Hardened-7928CA?style=for-the-badge&logo=rust&logoColor=white)](https://furlpay.github.io/docs/#/docs/PROJECT-FURLPAY-SEARCH-IMPLEMENTATION-MASTER-PLAN)
+
+<p align="center">
+  <b>🌐 <a href="https://furlpay.github.io/docs/#/">Read Our Live Documentation: https://furlpay.github.io/docs/#/</a></b><br>
+  <sub>Interactive full-text search, live sidebar navigation, Mermaid architecture flows, and SIMD execution plans.</sub>
+</p>
+
+---
+
+#### Core Technology Stack
 
 [![Solana](https://img.shields.io/badge/Solana-9945FF?style=for-the-badge&logo=solana&logoColor=white)](https://solana.com)
 [![AWS](https://img.shields.io/badge/Amazon_AWS-FF9900?style=for-the-badge&logo=amazon-aws&logoColor=white)](https://aws.amazon.com)
 [![Circle](https://img.shields.io/badge/Circle_USDC_&_CCTP-007AFF?style=for-the-badge&logo=circle&logoColor=white)](https://circle.com)
+[![Rust](https://img.shields.io/badge/Rust_Search_Daemon-000000?style=for-the-badge&logo=rust&logoColor=white)](https://www.rust-lang.org)
+[![C++20 SIMD](https://img.shields.io/badge/C%2B%2B20-AVX512_SIMD-00599C?style=for-the-badge&logo=c%2B%2B&logoColor=white)](https://en.cppreference.com/w/cpp/20)
+[![WebAssembly](https://img.shields.io/badge/WebAssembly-Edge_Wasm-654FF0?style=for-the-badge&logo=webassembly&logoColor=white)](https://webassembly.org/)
+[![Cloudflare](https://img.shields.io/badge/Cloudflare-Workers_KV-F38020?style=for-the-badge&logo=cloudflare&logoColor=white)](https://workers.cloudflare.com/)
+[![Docsify](https://img.shields.io/badge/Docsify-v4_SPA-42b983?style=for-the-badge&logo=vue.js&logoColor=white)](https://docsify.js.org)
 [![Next.js 15](https://img.shields.io/badge/Next.js_15-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![React Native](https://img.shields.io/badge/React_Native-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactnative.dev)
 [![Kotlin](https://img.shields.io/badge/Kotlin_2.1-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white)](https://kotlinlang.org)
 [![Swift](https://img.shields.io/badge/Swift_6.0-F05138?style=for-the-badge&logo=swift&logoColor=white)](https://swift.org)
-[![Rust](https://img.shields.io/badge/Rust_Anchor-000000?style=for-the-badge&logo=rust&logoColor=white)](https://www.rust-lang.org)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org)
 [![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io)
 [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com)
 [![Terraform](https://img.shields.io/badge/Terraform_IaC-7B42BC?style=for-the-badge&logo=terraform&logoColor=white)](https://www.terraform.io)
 [![Linux](https://img.shields.io/badge/Ubuntu_Linux-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)](https://ubuntu.com)
 
-Enterprise-grade technical documentation: the AWS migration architecture, Solana Alpenglow finality handling, Circle CCTP v2 cross-chain rails, Rain JIT virtual-card rail blueprints, and internal security reviews. Documents marked **Blueprint** or **Plan** describe the target architecture, not what runs today.
+Enterprise-grade technical documentation: the AWS migration architecture, Solana Alpenglow finality handling, Circle CCTP v2 cross-chain rails, Rain JIT virtual-card rail blueprints, AI agent retrieval runtimes, and internal security reviews. Documents marked **Blueprint** or **Plan** describe the target architecture, not what runs today.
 
 </div>
+
+---
+
+> ### 📖 Read Our Live Documentation: [furlpay.github.io/docs](https://furlpay.github.io/docs/#/)
+>
+> **Access the full SPA documentation suite with real-time search, interactive navigation, and deep-linkable sections:**
+> * ⚡ **AI Agent Search & Retrieval Runtime (Master Plan):** [furlpay.github.io/docs/#/docs/PROJECT-FURLPAY-SEARCH-IMPLEMENTATION-MASTER-PLAN](https://furlpay.github.io/docs/#/docs/PROJECT-FURLPAY-SEARCH-IMPLEMENTATION-MASTER-PLAN)
+> * 🔬 **AI Code & Web Search Research Report (2026):** [furlpay.github.io/docs/#/reports/ai_agent_code_and_web_search_2026_master_report](https://furlpay.github.io/docs/#/reports/ai_agent_code_and_web_search_2026_master_report)
+> * 🏛️ **Enterprise Financial Architecture (AWS Migration):** [furlpay.github.io/docs/#/docs/ENTERPRISE-ARCHITECTURE-2026-2027](https://furlpay.github.io/docs/#/docs/ENTERPRISE-ARCHITECTURE-2026-2027)
+> * 🚀 **Solana Alpenglow & Finality Engine:** [furlpay.github.io/docs/#/docs/SOLANA-ALPENGLOW-FINALITY](https://furlpay.github.io/docs/#/docs/SOLANA-ALPENGLOW-FINALITY)
 
 ---
 
@@ -313,6 +341,8 @@ These are **internal** reviews. FurlPay has not had a third-party security audit
 
 | Layer | Technologies & Protocols |
 | :--- | :--- |
+| **Interactive Documentation Portal** | **Docsify v4 SPA**, GitHub Pages, Markdown, Mermaid.js, Prism.js Syntax Highlighting, KaTeX Math. Hosted live at [furlpay.github.io/docs/#/](https://furlpay.github.io/docs/#/). |
+| **AI Agent Search & Retrieval Engine** | **Rust (furlpayd daemon, safe runtime)**, **C++20 (AVX-512, AVX2, NEON SIMD kernels)**, **Tantivy (BM25 full-text)**, **Tree-sitter (AST symbol graph)**, **ArcSwap (RCU lock-free generation swapping)**, **SPSC Ring Buffers (15 µs IPC)**, **Cloudflare Workers KV (Edge Vault)**, **Lexbor (SIMD HTML parser)**, **Model Context Protocol (MCP)**. |
 | **Hosting & data (current)** | **Vercel** (Next.js), **Supabase Postgres** via PostgREST, **Upstash Redis** (REST), Anthropic API (Claude Haiku 4.5). |
 | **Cloud & Infrastructure (target, decided 22 Oct 2026)** | **Amazon Web Services (AWS)**: Route 53, CloudFront, AWS WAF, ALB, ECS Fargate, Aurora PostgreSQL 16 Serverless v2 (native `pg` driver), Amazon S3, ElastiCache, Amazon SQS, EventBridge, Secrets Manager, AWS KMS (Ed25519 and secp256k1 signing), CloudWatch, GuardDuty, CloudTrail, Terraform. Nitro Enclaves under research. |
 | **Blockchain access** | Managed RPC providers with ordered failover; each endpoint must prove it serves the right chain. **No self-operated nodes are planned** (Solana mainnet now requires Agave v4.3.2; see [AWS Data and Event Infrastructure](aws/AWS-DATA-EVENT-INFRASTRUCTURE.md#4-managed-versus-self-operated-solana-rpc)). |
@@ -326,9 +356,10 @@ These are **internal** reviews. FurlPay has not had a third-party security audit
 
 ## Community & Support
 
-- GitHub Organization: [github.com/FurlPay](https://github.com/FurlPay)
-- Developer Documentation: [github.com/FurlPay/docs](https://github.com/FurlPay/docs)
-- Security Inquiries: [security@furlpay.com](mailto:security@furlpay.com)
+- **Interactive Documentation Portal**: [https://furlpay.github.io/docs/#/](https://furlpay.github.io/docs/#/)
+- **Documentation Source Repository**: [github.com/FurlPay/docs](https://github.com/FurlPay/docs)
+- **GitHub Organization**: [github.com/FurlPay](https://github.com/FurlPay)
+- **Security Inquiries**: [security@furlpay.com](mailto:security@furlpay.com)
 
 ---
 
