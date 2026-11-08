@@ -49,6 +49,7 @@ Enterprise-grade technical documentation: the AWS migration architecture, Solana
 >
 > **Access the full SPA documentation suite with real-time search, interactive navigation, and deep-linkable sections:**
 > * ⚡ **AI Agent Search & Retrieval Runtime (Master Plan):** [furlpay.github.io/docs/#/docs/PROJECT-FURLPAY-SEARCH-IMPLEMENTATION-MASTER-PLAN](https://furlpay.github.io/docs/#/docs/PROJECT-FURLPAY-SEARCH-IMPLEMENTATION-MASTER-PLAN)
+> * 📊 **Empirical Search Benchmark & Quality Report (2026):** [furlpay.github.io/docs/#/docs/FURLPAY-SEARCH-BENCHMARK-AND-EVALUATION-REPORT-2026](https://furlpay.github.io/docs/#/docs/FURLPAY-SEARCH-BENCHMARK-AND-EVALUATION-REPORT-2026)
 > * 🔬 **AI Code & Web Search Research Report (2026):** [furlpay.github.io/docs/#/reports/ai_agent_code_and_web_search_2026_master_report](https://furlpay.github.io/docs/#/reports/ai_agent_code_and_web_search_2026_master_report)
 > * 🏛️ **Enterprise Financial Architecture (AWS Migration):** [furlpay.github.io/docs/#/docs/ENTERPRISE-ARCHITECTURE-2026-2027](https://furlpay.github.io/docs/#/docs/ENTERPRISE-ARCHITECTURE-2026-2027)
 > * 🚀 **Solana Alpenglow & Finality Engine:** [furlpay.github.io/docs/#/docs/SOLANA-ALPENGLOW-FINALITY](https://furlpay.github.io/docs/#/docs/SOLANA-ALPENGLOW-FINALITY)

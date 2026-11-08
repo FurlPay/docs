@@ -19,6 +19,7 @@
 
 * **AI Agent Search & Retrieval (2026 Master Plan)**
   * [Search Implementation Master Plan](docs/PROJECT-FURLPAY-SEARCH-IMPLEMENTATION-MASTER-PLAN.md)
+  * [Search Benchmark & Quality Report](docs/FURLPAY-SEARCH-BENCHMARK-AND-EVALUATION-REPORT-2026.md)
   * [AI Code & Web Search Research Report](reports/ai_agent_code_and_web_search_2026_master_report.md)
 
 * **AWS Infrastructure (blueprints)**
