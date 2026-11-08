@@ -40,8 +40,9 @@ All microbenchmarks were executed using Criterion 0.5.1 with 100 sample collecti
 
 ```text
 ===============================================================================
-FurlPay Core Microbenchmark Suite (Criterion 0.5.1)
+FurlPay Core & SIMD Microbenchmark Suite (Criterion 0.5.1)
 Target: x86_64-pc-windows-msvc (Release Mode, LTO=Fat)
+Hardware Acceleration Detected: X86Avx2 (x86-64 AVX2 256-bit)
 ===============================================================================
 
 1. Trigram Index Substring Retrieval:
@@ -49,16 +50,23 @@ Target: x86_64-pc-windows-msvc (Release Mode, LTO=Fat)
    - 1,000 Documents:   [56.78 µs  ...  59.44 µs  ...  62.24 µs]  (p50: 59.44 µs)
    - 10,000 Documents:  [449.87 µs ...  468.08 µs ...  488.03 µs] (p50: 468.08 µs)
 
-2. Query Classification (Exact, Regex, Symbol, CallGraph, Hybrid):
+2. Posting List SIMD Intersection (simd_vs_scalar_intersection):
+   - 100 Elements:      [65.18 ns  ...  66.08 ns  ...  66.98 ns]   (p50: 66.08 ns)
+   - 1,000 Elements:    [548.46 ns ...  567.16 ns ...  590.32 ns]  (p50: 567.16 ns)
+   - 10,000 Elements:   [5.216 µs  ...  5.280 µs  ...  5.353 µs]   (p50: 5.28 µs)
+   - 50,000 Elements:   [27.09 µs  ...  27.48 µs  ...  27.87 µs]   (p50: 27.48 µs)
+   * Semantic Verification: Bit-for-bit output equivalence asserted against scalar baseline.
+
+3. Query Classification (Exact, Regex, Symbol, CallGraph, Hybrid):
    - Batch 5 Queries:   [1.153 µs  ...  1.178 µs  ...  1.204 µs]   (~235 ns / query)
 
-3. Reciprocal Rank Fusion (RRF k=60):
+4. Reciprocal Rank Fusion (RRF k=60):
    - 2x 50-item Lists:  [6.505 µs  ...  6.681 µs  ...  6.881 µs]   (p50: 6.68 µs)
 
-4. Relevance Scorer (Trigram + BM25 + AST + Recency):
+5. Relevance Scorer (Trigram + BM25 + AST + Recency):
    - Batch 100 Docs:    [554.71 ns ...  566.46 ns ...  578.91 ns]  (~5.66 ns / doc)
 
-5. AST Symbol Graph Traversal:
+6. AST Symbol Graph Traversal:
    - Callees Lookup:    [1.678 µs  ...  1.732 µs  ...  1.784 µs]   (p50: 1.73 µs)
 ===============================================================================
 ```
