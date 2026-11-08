@@ -25,7 +25,7 @@ To eliminate implementation risk and prevent building two unvalidated retrieval 
 
 Project FurlPay is organized as a Cargo workspace with native C++ SIMD compilation units, enforcing strict memory safety boundaries, zero-copy data passing, and multi-architecture hardware portability.
 
-```
+```text
 furlpay/
 ├── Cargo.toml                          # Workspace root manifest
 ├── Cargo.lock
@@ -124,7 +124,7 @@ furlpay/
 ### 2.1 Positional Trigram Index Format
 A naive trigram index storing only document IDs fails on exact substring matching and regex literal verification. Furlpay utilizes a **positional trigram posting list**:
 
-```
+```text
 +-----------------------------------------------------------------------------------------+
 | POSITIONAL TRIGRAM SCHEMA                                                               |
 |                                                                                         |
@@ -260,29 +260,14 @@ impl GenerationManager {
 
 Do not execute every query across all five retrieval systems. The query routing engine classifies queries and selects optimal primary and secondary pipelines:
 
-```
-+---------------------------------------------------------------------------------------------------------+
-| QUERY CLASSIFICATION    | PRIMARY PATH          | SECONDARY PATH        | FALLBACK ESCALATION           |
-+-------------------------+-----------------------+-----------------------+-------------------------------+
-| 1. Exact Identifier     | Positional Trigram    | SIMD Teddy Verify     | Route to BM25 if all trigrams |
-|    e.g. `handlePayment` | Index Lookup          | against raw bytes     | exceed 40% Document Frequency |
-+-------------------------+-----------------------+-----------------------+-------------------------------+
-| 2. Regular Expression   | Literal Trigram       | Intel Hyperscan /     | Full streaming regex scan if  |
-|    e.g. `get.*Token`    | Extraction Prefilter  | PCRE2 DFA Engine      | no literal trigrams extracted |
-+-------------------------+-----------------------+-----------------------+-------------------------------+
-| 3. Code Symbol / Def    | Symbol Graph (Def-Use)| Tree-sitter AST       | Tantivy BM25 symbol index if  |
-|    e.g. `fn verifyAuth` | In-Memory Database    | Scope Verification    | syntax tree is unparsed/broken|
-+-------------------------+-----------------------+-----------------------+-------------------------------+
-| 4. Natural Language     | Tantivy BM25 Full-Text| Semantic Vector       | Token-filtered positional scan|
-|    e.g. "JWT refresh"   | Inverted Index        | Cosine Distance       | if vector model unavailable   |
-+-------------------------+-----------------------+-----------------------+-------------------------------+
-| 5. Cross-File Call Graph| Symbol Call-Graph DB  | AST Parent Scope Walk | Multi-file regex prefilter    |
-|    e.g. "who calls X?"  | (Caller/Callee Map)   | (Type References)     | across workspace boundary     |
-+-------------------------+-----------------------+-----------------------+-------------------------------+
-| 6. Hybrid / Complex     | Parallel Execution:   | Reciprocal Rank Fusion| Dynamic weight re-tuning      |
-|    Engineering Question | Trigram + BM25 + AST  | Scorer ($k=60$)       | based on token entropy        |
-+-------------------------+-----------------------+-----------------------+-------------------------------+
-```
+| Query Classification | Primary Pathway | Secondary Pathway | Fallback Escalation |
+| :--- | :--- | :--- | :--- |
+| **1. Exact Identifier**<br>`handlePayment`, `0x8f2a` | **Positional Trigram Index**<br>Flat array `XXH3_64bits` directory lookup | **SIMD Teddy Verify**<br>Byte-level verification against raw text | Route to BM25 if all trigrams exceed 40% Document Frequency |
+| **2. Regular Expression**<br>`get.*Token`, `^Bearer\s+` | **Literal Trigram Prefilter**<br>Extract fixed substrings | **Intel Hyperscan / PCRE2**<br>Vectorized DFA regex engine | Full streaming regex scan if no literal trigrams extracted |
+| **3. Code Symbol / Definition**<br>`fn verifyAuth`, `class Ledger` | **Symbol Graph (Def-Use)**<br>In-memory call hierarchy database | **Tree-sitter AST Scope**<br>Syntactic parent/child verification | Tantivy BM25 symbol index if syntax tree is unparsed/broken |
+| **4. Natural Language**<br>"JWT refresh token expiration" | **Tantivy BM25**<br>Full-text inverted index | **Semantic Vector**<br>Cosine similarity over embeddings | Token-filtered positional scan if vector model unavailable |
+| **5. Cross-File Call Graph**<br>"who calls initiateTransfer?" | **Symbol Call-Graph DB**<br>Caller/callee bidirectional index | **AST Parent Scope Walk**<br>Cross-file type references | Multi-file regex prefilter across workspace boundary |
+| **6. Hybrid / Complex Question**<br>Multi-token agent engineering task | **Parallel Execution**<br>Trigram + BM25 + AST in parallel | **Reciprocal Rank Fusion (RRF)**<br>Multi-signal scorer ($k=60$) | Dynamic weight re-tuning based on query token entropy |
 
 ---
 
@@ -348,6 +333,7 @@ FurlpayCpuArch furlpay_detect_cpu(void) {
     if (avx_ready && avx512_ready && has_avx512f && has_avx512cd && has_avx512dq && has_avx512bw) {
         return CPU_ARCH_X86_AVX512;
     }
+
     if (has_avx2) {
         return CPU_ARCH_X86_AVX2;
     }
@@ -409,27 +395,23 @@ pub fn intersect_posting_lists(a: &[u32], b: &[u32], output: &mut Vec<u32>) {
 ### 5.1 Storage-Tier Performance Truth Matrix
 Memory-mapped files on an SSD do not guarantee sub-millisecond execution. Performance is strictly governed by page residency:
 
-```
-+---------------------------------------------------------------------------------------------------------+
-| STORAGE TIER          | STORAGE MEDIUM       | WORKING SET STATE     | MEASURED LATENCY RANGE (p99)     |
-+-----------------------+----------------------+-----------------------+----------------------------------+
-| L1: CPU Cache         | L1/L2/L3 Registers   | Pinned Active Vectors | 20 – 60 nanoseconds              |
-| L2: Resident RAM      | 2MB THP Pinned RAM   | Memory-Locked Index   | 100 – 180 microseconds (0.18 ms) |
-| L3: Warm OS Buffer    | OS Page Cache (mmap) | Recently Touched Files| 350 – 850 microseconds (0.85 ms) |
-| L4: Cold NVMe Storage | PCIe Gen4 NVMe SSD   | Cold Page Fault (I/O) | 45 – 120 milliseconds (120 ms)   |
-| L5: Remote Persistent | Object Store (S3/GCS)| Unindexed History     | 250 – 1,500 milliseconds         |
-+-----------------------+----------------------+-----------------------+----------------------------------+
-```
+| Storage Tier | Storage Medium | Working Set State | Measured Latency Range (p99) |
+| :--- | :--- | :--- | :--- |
+| **L1: CPU Cache** | L1 / L2 / L3 Registers | Pinned Active Vectors | 20 – 60 nanoseconds |
+| **L2: Resident RAM** | 2MB THP Pinned RAM | Memory-Locked Index (`mlock`) | 100 – 180 microseconds (0.18 ms) |
+| **L3: Warm OS Buffer** | OS Page Cache (`mmap`) | Recently Touched Files | 350 – 850 microseconds (0.85 ms) |
+| **L4: Cold NVMe Storage** | PCIe Gen4 NVMe SSD | Cold Page Fault (I/O) | 45 – 120 milliseconds (120 ms) |
+| **L5: Remote Persistent** | Object Store (S3 / GCS) | Unindexed Workspace History | 250 – 1,500 milliseconds |
 
 ### 5.2 End-to-End Code Search Latency Breakdown (Resident Working Set)
-Correcting the previous arithmetic inconsistency, here is the mathematically verified percentile budget:
+Correcting previous arithmetic discrepancies, here is the mathematically verified percentile budget for resident queries:
 
 | Pipeline Stage | Implementation Mechanism | p50 Latency | p95 Latency | p99 Latency |
 | :--- | :--- | :--- | :--- | :--- |
 | **1. Agent IPC Dispatch** | Dedicated SPSC Ring Buffer (`shm_open`) | 8 µs | 12 µs | 16 µs |
 | **2. Query Classification** | Tokenizer + AST Symbol Disambiguation | 14 µs | 20 µs | 26 µs |
 | **3. Trigram Lookup** | Flat array `XXH3_64bits` hash directory | 22 µs | 35 µs | 45 µs |
-| **4. SIMD Intersection** | Runtime AVX-512/AVX2/Scalar kernel | 85 µs | 120 µs | 145 µs |
+| **4. SIMD Intersection** | Runtime AVX-512 / AVX2 / NEON / Scalar kernel | 85 µs | 120 µs | 145 µs |
 | **5. Secondary Verification** | Vectorized Teddy / `memchr` substring scan | 80 µs | 115 µs | 135 µs |
 | **6. Snippet & AST Scope** | Tree-sitter scope boundary extraction | 35 µs | 55 µs | 70 µs |
 | **7. Security & Permissions** | Cryptographic tenant token validation | 6 µs | 10 µs | 14 µs |
@@ -440,23 +422,12 @@ Correcting the previous arithmetic inconsistency, here is the mathematically ver
 
 ## 6. Tri-Modal Web Retrieval Architecture (Milestone 2)
 
-```
-+---------------------------------------------------------------------------------------------------------+
-| PATHWAY               | TRIGGER CONDITION    | INFRASTRUCTURE PIPELINE        | LATENCY DISTRIBUTION    |
-+-----------------------+----------------------+--------------------------------+-------------------------+
-| Path A: Edge Vault    | Static Dev Docs (MDN,| Cloudflare Workers Edge KV     | p50: 18 ms              |
-| Cache Hit             | GitHub, PyPI, npmjs) | Pre-rendered Clean Markdown    | p95: 35 ms; p99: 50 ms  |
-+-----------------------+----------------------+--------------------------------+-------------------------+
-| Path B: Live SERP     | General programming  | Hedged QUIC 0-RTT Race:        | p50: 160 ms             |
-| Fast-Path             | queries, novel errors| Brave Search API + Exa Neural  | p95: 280 ms; p99: 420 ms|
-+-----------------------+----------------------+--------------------------------+-------------------------+
-| Path C: Live Crawl &  | Deep blog posts, API | Fast SERP + Direct HTTP/3 GET  | p50: 380 ms             |
-| Extraction            | references, changelog| Native C Lexbor Parser (<12 ms)| p95: 650 ms; p99: 1,200ms|
-+-----------------------+----------------------+--------------------------------+-------------------------+
-| Path D: Complex SPA   | Heavy client-side    | Async Headless Chromium Pool   | p50: 3,200 ms           |
-| Hydration (Fallback)  | JS hydration (React) | Playwright / CDP Cluster       | p95: 5,500 ms; p99: 8,000|
-+-----------------------+----------------------+--------------------------------+-------------------------+
-```
+| Pathway | Trigger Condition | Infrastructure Pipeline | Latency Distribution |
+| :--- | :--- | :--- | :--- |
+| **Path A: Edge Vault Cache Hit** | Static Dev Docs (MDN, GitHub, PyPI, npmjs, crates.io) | Cloudflare Workers Edge KV<br>Pre-rendered Clean Markdown | **p50:** 18 ms<br>**p95:** 35 ms<br>**p99:** 50 ms |
+| **Path B: Live SERP Fast-Path** | General programming queries, novel errors, release notes | Hedged QUIC 0-RTT Race:<br>Brave Search API + Exa Neural | **p50:** 160 ms<br>**p95:** 280 ms<br>**p99:** 420 ms |
+| **Path C: Live Crawl & Extraction** | Deep blog posts, API references, changelog URLs | Fast SERP + Direct HTTP/3 GET<br>Native C Lexbor Parser (<12 ms) | **p50:** 380 ms<br>**p95:** 650 ms<br>**p99:** 1,200 ms |
+| **Path D: Complex SPA Hydration (Fallback)** | Heavy client-side JS hydration (React, Vue, Angular) | Async Headless Chromium Pool<br>Playwright / CDP Cluster | **p50:** 3,200 ms<br>**p95:** 5,500 ms<br>**p99:** 8,000 ms |
 
 ### Key Web Pipeline Safeguards:
 1. **HTTP/3 Stream Cancellation:** Slower hedged requests are terminated using standard HTTP/3 `H3_REQUEST_CANCELLED` error codes over QUIC `RESET_STREAM` frames.
@@ -477,11 +448,27 @@ The Model Context Protocol server exposes standardized tools over stdio/JSON-RPC
   "inputSchema": {
     "type": "object",
     "properties": {
-      "query": { "type": "string", "description": "Search term, regex pattern, or symbol name" },
-      "query_type": { "type": "string", "enum": ["exact", "regex", "symbol", "hybrid"], "default": "hybrid" },
-      "path_glob": { "type": "string", "description": "Optional file filter (e.g. src/**/*.rs)" },
-      "max_results": { "type": "integer", "default": 10 },
-      "timeout_ms": { "type": "integer", "default": 500 }
+      "query": {
+        "type": "string",
+        "description": "Search term, regex pattern, or symbol name"
+      },
+      "query_type": {
+        "type": "string",
+        "enum": ["exact", "regex", "symbol", "hybrid"],
+        "default": "hybrid"
+      },
+      "path_glob": {
+        "type": "string",
+        "description": "Optional file filter (e.g. src/**/*.rs)"
+      },
+      "max_results": {
+        "type": "integer",
+        "default": 10
+      },
+      "timeout_ms": {
+        "type": "integer",
+        "default": 500
+      }
     },
     "required": ["query"]
   }
@@ -496,9 +483,19 @@ The Model Context Protocol server exposes standardized tools over stdio/JSON-RPC
   "inputSchema": {
     "type": "object",
     "properties": {
-      "query": { "type": "string", "description": "Technical query or API documentation request" },
-      "require_crawl": { "type": "boolean", "default": false },
-      "freshness": { "type": "string", "enum": ["day", "week", "month", "any"], "default": "any" }
+      "query": {
+        "type": "string",
+        "description": "Technical query or API documentation request"
+      },
+      "require_crawl": {
+        "type": "boolean",
+        "default": false
+      },
+      "freshness": {
+        "type": "string",
+        "enum": ["day", "week", "month", "any"],
+        "default": "any"
+      }
     },
     "required": ["query"]
   }
@@ -519,54 +516,26 @@ The Model Context Protocol server exposes standardized tools over stdio/JSON-RPC
 
 ## 9. Testing, Quality Assurance & Fuzzing Protocol
 
-```
-+---------------------------------------------------------------------------------------------------------+
-| TESTING WORKSTREAM            | TOOLS & FRAMEWORKS             | ACCEPTANCE CRITERIA                    |
-+-------------------------------+--------------------------------+----------------------------------------+
-| 1. SIMD Differential Testing  | `proptest` / `quickcheck`      | 100,000,000 randomized posting lists   |
-|                               |                                | AVX-512, AVX2, NEON match Scalar 100%  |
-+-------------------------------+--------------------------------+----------------------------------------+
-| 2. Crash & Security Fuzzing   | `cargo-fuzz` / `libFuzzer`     | Zero crashes on malformed queries,     |
-|                               | Sanitizers (ASAN, MSAN, TSAN)  | hostile HTML, or corrupted index files |
-+-------------------------------+--------------------------------+----------------------------------------+
-| 3. Concurrency Verification   | Loom / ThreadSanitizer         | Zero torn reads, data corruption,      |
-|                               | SPSC single-pair ring buffer   | or deadlock under continuous load      |
-+-------------------------------+--------------------------------+----------------------------------------+
-| 4. Incremental Index Sync     | Git-fuzz automated commits     | Incremental index matches clean        |
-|                               | File mutation stress tests     | rebuild after 10,000 random file edits |
-+-------------------------------+--------------------------------+----------------------------------------+
-| 5. Grounded MRR Evaluation    | CodeSearchNet & RepoEval       | Statistically validated MRR > 0.435    |
-|                               | 20,000 query evaluation set    | with 95% bootstrap confidence interval |
-+-------------------------------+--------------------------------+----------------------------------------+
-```
+| Testing Workstream | Tools & Frameworks | Acceptance Criteria |
+| :--- | :--- | :--- |
+| **1. SIMD Differential Testing** | `proptest` / `quickcheck` | 100,000,000 randomized posting lists.<br>AVX-512, AVX2, and NEON outputs match Scalar reference 100%. |
+| **2. Crash & Security Fuzzing** | `cargo-fuzz` / `libFuzzer`<br>Sanitizers (ASAN, MSAN, TSAN) | Zero crashes on malformed queries, hostile HTML payloads, or corrupted index generation files. |
+| **3. Concurrency Verification** | Loom / ThreadSanitizer<br>SPSC single-pair ring buffer | Zero torn reads, zero memory corruption, zero deadlocks under continuous concurrent query load. |
+| **4. Incremental Index Sync** | Git-fuzz automated commits<br>File mutation stress harness | Incremental index state matches clean rebuild bit-for-bit after 10,000 random file mutations. |
+| **5. Grounded MRR Evaluation** | CodeSearchNet & RepoEval<br>20,000 query evaluation set | Statistically validated $\text{MRR} > 0.435$ with 95% bootstrap confidence interval. |
 
 ---
 
 ## 10. Engineering Execution Schedule (18 Weeks)
 
-```
-+---------------------------------------------------------------------------------------------------------+
-| PHASE   | SPRINT    | WEEKS     | ENGINEERING FOCUS AND CORE DELIVERABLES                               |
-+---------+-----------+-----------+-----------------------------------------------------------------------+
-| Phase 1 | Sprint 1  | Weeks 1-2 | Benchmark Foundation: Scalar baseline, CodeSearchNet dataset,         |
-|         |           |           | OpenTelemetry histogram telemetry, and CPUID feature detection.       |
-+---------+-----------+-----------+-----------------------------------------------------------------------+
-| Phase 2 | Sprint 2-3| Weeks 3-5 | Core In-Memory Daemon: Positional trigram index, Tantivy BM25 layer,  |
-|         |           |           | ArcSwap generation manager, and inotify incremental watcher.          |
-+---------+-----------+-----------+-----------------------------------------------------------------------+
-| Phase 3 | Sprint 4-5| Weeks 6-8 | Structural & Hybrid Retrieval: Tree-sitter AST, Symbol Graph,         |
-|         |           |           | query routing matrix, RRF ranker, and SIMD galloping kernels.         |
-+---------+-----------+-----------+-----------------------------------------------------------------------+
-| Phase 4 | Sprint 6  | Weeks 9-10| Agent Integration: Dedicated SPSC shared-memory IPC, Model Context    |
-|         |           |           | Protocol (MCP) server, and IDE plugins (Cursor / Antigravity).        |
-+---------+-----------+-----------+-----------------------------------------------------------------------+
-| Phase 5 | Sprint 7-8| Weeks 11-14| Web Retrieval Engine: Cloudflare Edge Vault KV, hedged QUIC 0-RTT      |
-|         |           |           | racer, native Lexbor HTML parser, and async Chromium worker pool.     |
-+---------+-----------+-----------+-----------------------------------------------------------------------+
-| Phase 6 | Sprint 9  | Weeks 15-18| Hardening & Release: Multi-tenant security audit, secret redaction,   |
-|         |           |           | proptest differential suite, and independent benchmark publication.   |
-+---------+-----------+-----------+-----------------------------------------------------------------------+
-```
+| Phase | Sprint | Timeline | Engineering Focus & Core Deliverables |
+| :--- | :--- | :--- | :--- |
+| **Phase 1** | Sprint 1 | Weeks 1–2 | **Benchmark Foundation:** Scalar baseline, CodeSearchNet dataset harness, OpenTelemetry histogram telemetry export, and CPUID + OSXSAVE runtime feature detection. |
+| **Phase 2** | Sprint 2–3 | Weeks 3–5 | **Core In-Memory Daemon:** Positional trigram index, Tantivy BM25 layer, `ArcSwap` generation manager, and inotify/ReadDirectoryChangesW incremental watcher. |
+| **Phase 3** | Sprint 4–5 | Weeks 6–8 | **Structural & Hybrid Retrieval:** Tree-sitter AST, Symbol Graph (Def-Use), query routing matrix, RRF ranker ($k=60$), and SIMD galloping kernels (AVX-512 / AVX2 / NEON). |
+| **Phase 4** | Sprint 6 | Weeks 9–10 | **Agent Integration:** Dedicated SPSC shared-memory IPC, Model Context Protocol (MCP) server, and IDE plugins (Cursor / Antigravity). |
+| **Phase 5** | Sprint 7–8 | Weeks 11–14 | **Web Retrieval Engine:** Cloudflare Edge Vault KV adapter, hedged QUIC 0-RTT racer, native Lexbor HTML-to-Markdown parser, and async Chromium worker pool. |
+| **Phase 6** | Sprint 9 | Weeks 15–18 | **Hardening & Release:** Multi-tenant security audit, automated secret redaction, proptest differential suite, and independent benchmark publication. |
 
 ---
 *Architectural Master Plan approved for engineering implementation in `FurlPay/docs`.*
