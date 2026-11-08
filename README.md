@@ -300,6 +300,15 @@ These are **internal** reviews. FurlPay has not had a third-party security audit
 
 ---
 
+### 7. AI Agent Search & Retrieval Infrastructure (docs/ & reports/)
+
+* [Project FurlPay — Technical Implementation Master Plan (v1.1 Production Hardened)](docs/PROJECT-FURLPAY-SEARCH-IMPLEMENTATION-MASTER-PLAN.md)  
+  Engineering master plan for FurlPay's high-performance AI retrieval runtime: repository structure (7 crates), multi-target SIMD dispatch (AVX-512 / AVX2 / NEON / scalar), ArcSwap immutable generation manager, positional trigram schema, dedicated per-client SPSC ring buffers, tri-modal web routing, MCP server specification, proptest/fuzzing validation, and 18-week phased execution schedule.
+* [AI Agent Code & Web Search in 2026: Technical Architecture, Benchmarks, and Blueprint](reports/ai_agent_code_and_web_search_2026_master_report.md)  
+  Deep-dive technical research report comparing Google Antigravity, Cursor, and GitHub Copilot/Blackbird against the May 2026 Entire benchmark. Deconstructs the tool latency vs. inference bottleneck paradox, empirical MRR evaluation, storage-tier latency distributions, and the Project Furlpay sub-0.5 target.
+
+---
+
 ## Technology Stack Breakdown
 
 | Layer | Technologies & Protocols |

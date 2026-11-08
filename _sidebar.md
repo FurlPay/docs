@@ -17,6 +17,10 @@
   * [Master Report Review](reports/ENTERPRISE-MASTER-REPORT-REVIEW-2026-10.md)
   * [P1–Pn AWS Audit Review (26 Oct)](reports/AWS-INFRASTRUCTURE-AUDIT-REVIEW-2026-10-26.md)
 
+* **AI Agent Search & Retrieval (2026 Master Plan)**
+  * [Search Implementation Master Plan](docs/PROJECT-FURLPAY-SEARCH-IMPLEMENTATION-MASTER-PLAN.md)
+  * [AI Code & Web Search Research Report](reports/ai_agent_code_and_web_search_2026_master_report.md)
+
 * **AWS Infrastructure (blueprints)**
   * [AWS Engagement Brief](aws/AWS-ENGAGEMENT-BRIEF.md)
   * [USDC Payment Flow & AWS](aws/FURLPAY_USDC_PAYMENT_FLOW_AND_AWS_ARCHITECTURE.md)
