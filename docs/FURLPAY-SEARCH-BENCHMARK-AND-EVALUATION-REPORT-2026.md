@@ -273,21 +273,38 @@ In Sprint 3 (November 2026), FurlPay Search was evolved to eliminate all hardcod
 | `DE89370400440532013000` (German IBAN) | `FinancialIdentifier { kind: "IBAN" }` | **$364\ \mu\text{s}$** | `financial.iban`: `CryptographicallyVerified` (ISO 7064 Mod 97-10 check passed) |
 | `123e4567-e89b-12d3-a456-426614174000` (UUID v1) | `CryptographicHash { algorithm: "UUID" }` | **$496\ \mu\text{s}$** | `crypto.uuid`: `FormatValidated` (RFC 4122 v1 specification verified) |
 | `https://docs.rs/tokio/latest/tokio/` (URL) | `Url` / `DirectUrlFetch` | **$211\ \mu\text{s}$** | `internet.url`: `FormatValidated` (HTTPS scheme, host: `docs.rs`) |
-| `t` (Single letter prefix) | `ExactIdentifier` | **$364\ \mu\text{s}$** | Fast prefix search across 119 files (15 matches, TTFV $114\ \mu\text{s}$) |
-| `tron` (Lowercase identifier) | `ExactIdentifier` | **$452\ \mu\text{s}$** | Trigram exact + AST symbols (11 matches, TTFV $63\ \mu\text{s}$) |
+| `t` (Single letter prefix) | `AmbiguousShortQuery { ch: 't' }` (conf: 0.30) | **$2.07\ \text{ms}$** | Explainable relevance: `tantivy_wrapper.rs`, `trigram.rs`, `tron.ts` (`DocumentExists`) |
+| `tr` (Two-character partial prefix) | `PartialTokenPrefix { prefix: "tr" }` (conf: 0.55) | **$2.18\ \text{ms}$** | Explainable relevance: `trigram.rs`, `tron.ts`, `treesitter.rs` (`DocumentExists`) |
+| `tron` (Lowercase identifier) | `ExactIdentifier` (conf: 0.88) | **$666\ \mu\text{s}$** | Trigram exact + AST symbols (11 matches, TTFV $250\ \mu\text{s}$, #1: `blockchain/tron.ts`) |
 | `""` (Empty query) | — | **$10\ \mu\text{s}$** | Terminal `search.completed` emitted immediately with `total_results: 0` |
 | `FURLPAY_NONEXISTENT_QUERY_99999` | `ExactIdentifier` | **$420\ \mu\text{s}$** | Terminal `search.completed` emitted with `total_results: 0` |
 
 ### 9.3 Workspace Test Verification
 
 Full workspace test suite execution (`cargo test --workspace`):
-* **furlpay-core:** 51 passed, 0 failed
+* **furlpay-core:** 52 passed, 0 failed
 * **furlpay-web:** 14 passed, 0 failed
 * **furlpay-ipc:** 6 passed, 0 failed
 * **furlpay-simd:** 4 passed, 0 failed
 * **furlpay-daemon:** 3 passed, 0 failed
 * **furlpay-eval:** 5 passed, 0 failed
-* **Total:** **83 passed; 0 failed; 0 ignored**
+* **Total:** **84 passed; 0 failed; 0 ignored**
+
+### 9.4 Real-Time Progressive SSE Latency & Byte Telemetry Matrix
+
+Empirical measurements gathered via real-time SSE stream consumption over HTTP (`http://127.0.0.1:3000/api/v1/search/stream`):
+
+| Query Label | Mode | HTTP Status | Response Bytes | Time to First Byte (TTFB) | Total Stream Latency | Verified Top Result / Entity |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| `t` (Typing 1 char) | `code` | `200 OK` | **$9,368\ \text{B}$** | **$44\ \text{ms}$** | **$52\ \text{ms}$** | `tantivy_wrapper` (`DocumentExists`) |
+| `tr` (Typing 2 chars) | `code` | `200 OK` | **$9,702\ \text{B}$** | **$1\ \text{ms}$** | **$3\ \text{ms}$** | `trigram` (`DocumentExists`) |
+| `tron` (Identifier) | `code` | `200 OK` | **$7,994\ \text{B}$** | **$< 1\ \text{ms}$** | **$1\ \text{ms}$** | `TRON TRC-20 USDT & TRX Payment Settlement` |
+| `TR7NHqjeKQx...` | `code` | `200 OK` | **$5,114\ \text{B}$** | **$< 1\ \text{ms}$** | **$1\ \text{ms}$** | `TRON Validated Wallet Address` (`CryptographicallyVerified`) |
+| `DE89370400...` | `code` | `200 OK` | **$3,569\ \text{B}$** | **$< 1\ \text{ms}$** | **$1\ \text{ms}$** | `FinancialIdentifier { IBAN }` (`CryptographicallyVerified`) |
+| `OpenAI` | `global` | `200 OK` | **$4,955\ \text{B}$** | **$1\ \text{ms}$** | **$880\ \text{ms}$** | `OpenAI (@OpenAI) / X` (`LiveNetworkRetrieved`) |
+| `Anthropic` | `global` | `200 OK` | **$5,003\ \text{B}$** | **$1\ \text{ms}$** | **$846\ \text{ms}$** | `Anthropic` (`LiveNetworkRetrieved`) |
+| `Google` | `global` | `200 OK` | **$3,707\ \text{B}$** | **$1\ \text{ms}$** | **$133\ \text{ms}$** | `Google` (`LiveNetworkRetrieved`) |
+| `deepseek` | `global` | `200 OK` | **$4,812\ \text{B}$** | **$1\ \text{ms}$** | **$2,350\ \text{ms}$** | `DeepSeek` (Wikipedia / API / GitHub) |
 
 ---
 *Report generated from genuine Cargo, Criterion, and furlpay-eval test runs.*
