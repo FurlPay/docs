@@ -23,6 +23,11 @@
   * [Search Benchmark & Quality Report](docs/FURLPAY-SEARCH-BENCHMARK-AND-EVALUATION-REPORT-2026.md)
   * [AI Code & Web Search Research Report](reports/ai_agent_code_and_web_search_2026_master_report.md)
 
+* **Generative AI Security & Governance (2026 Bedrock, Inspector & Q Developer)**
+  * [Bedrock AI Security & Governance Whitepaper](docs/FURLPAY-BEDROCK-AI-SECURITY-AND-GOVERNANCE-2026.md)
+  * [Secure Multi-Platform Chat System & Integration](docs/FURLPAY-SECURE-CHAT-SYSTEM-AND-CLIENT-INTEGRATION-2026.md)
+  * [Amazon Inspector & Amazon Q DevSecOps Guide](docs/FURLPAY-INSPECTOR-CODE-SECURITY-AND-Q-DEVELOPER-GUIDE-2026.md)
+
 * **AWS Infrastructure (blueprints)**
   * [AWS Engagement Brief](aws/AWS-ENGAGEMENT-BRIEF.md)
   * [USDC Payment Flow & AWS](aws/FURLPAY_USDC_PAYMENT_FLOW_AND_AWS_ARCHITECTURE.md)
