@@ -183,3 +183,17 @@ Variable names and descriptions are maintained in-repo, not here:
 `apps/web/.env.example` (621 lines) and the registry in
 `apps/web/src/lib/env.ts`. Those are the source of truth; this page covers
 only what *changes* when the host changes.
+
+---
+
+## 7. The executable guard (14 November 2026)
+
+The rules above are now enforced at boot by `apps/web/src/lib/aws/environment.ts` — `assertAwsConfiguration()` and `assertAwsIdentity()`:
+
+- `FURLPAY_ENV` (or its alias `AWS_DEPLOYMENT_ENV`) is **mandatory on any AWS deployment signal**; unknown values and alias disagreement refuse to boot. The silent-`development` fallback this page warned about is an error now.
+- `FURLPAY_EXPECTED_AWS_ACCOUNT_ID` is asserted against **STS GetCallerIdentity** — a development workload holding a production role is refused before serving traffic.
+- `AWS_ROLE_ARN` must be on `FURLPAY_ALLOWED_ROLE_ARNS`, and the role's account must match the expected account.
+- Secrets resolve to `furlpay/<environment>/…` and storage to `furlpay-<environment>-…` — cross-environment reads target nonexistent paths.
+- `movesRealMoney()` is true only for production; the payment layer consults the guard.
+
+Variables: see `apps/web/.env.example` (the AWS block) and `apps/web/src/lib/aws/environment.ts`. Details and the honest status matrix: [AWS dual-environment runtime guard](../aws/AWS-DUAL-ENVIRONMENT-RUNTIME-GUARD-2026-11-14.md).
